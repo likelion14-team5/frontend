@@ -1,99 +1,163 @@
 import React, { useState, useRef, useEffect } from 'react';
+import './index.css';
 
-// 검색 및 선택이 가능한 국가 목록 데이터
+// API의 country_code는 2자리 ISO 대문자 코드(예: KR)만 허용하므로, 국가명과 코드를 함께 들고 있는다
+// 프로필 폼의 빈 상태 - 초기값과 "저장 없이 닫기" 시 되돌릴 기본값으로 재사용
+const EMPTY_PROFILE = {
+  nickname: '',
+  country: '',
+  organization: '',
+  role: '',
+  languages: '',
+  englishProficiency: '',
+  communicationStyle: '',
+};
+
 const COUNTRY_LIST = [
-  '대한민국',
-  '미국',
-  '일본',
-  '중국',
-  '영국',
-  '독일',
-  '프랑스',
-  '캐나다',
-  '호주',
-  '베트남',
-  '싱가포르',
-  '인도네시아',
-  '태국',
-  '필리핀',
-  '인도',
-  '스페인',
-  '이탈리아',
-  '네덜란드',
-  '스위스',
-  '직접 입력'
+  { code: 'KR', name: '대한민국' },
+  { code: 'US', name: '미국' },
+  { code: 'JP', name: '일본' },
+  { code: 'CN', name: '중국' },
+  { code: 'GB', name: '영국' },
+  { code: 'DE', name: '독일' },
+  { code: 'FR', name: '프랑스' },
+  { code: 'CA', name: '캐나다' },
+  { code: 'AU', name: '호주' },
+  { code: 'VN', name: '베트남' },
+  { code: 'SG', name: '싱가포르' },
+  { code: 'ID', name: '인도네시아' },
+  { code: 'TH', name: '태국' },
+  { code: 'PH', name: '필리핀' },
+  { code: 'IN', name: '인도' },
+  { code: 'ES', name: '스페인' },
+  { code: 'IT', name: '이탈리아' },
+  { code: 'NL', name: '네덜란드' },
+  { code: 'CH', name: '스위스' },
+];
+
+// formData.country(코드)로부터 화면에 보여줄 국가명을 역으로 찾는 헬퍼
+const getCountryName = (code) => COUNTRY_LIST.find((c) => c.code === code)?.name || '';
+
+// API: english_proficiency enum - select 옵션에 표시할 한글 라벨
+const ENGLISH_PROFICIENCY_OPTIONS = [
+  { value: 'BEGINNER', label: '초급' },
+  { value: 'INTERMEDIATE', label: '중급' },
+  { value: 'ADVANCED', label: '고급' },
+];
+
+// API: communication_style enum - select 옵션에 표시할 한글 라벨
+const COMMUNICATION_STYLE_OPTIONS = [
+  { value: 'DIRECT', label: '직설적' },
+  { value: 'INDIRECT', label: '완곡한' },
+  { value: 'FACT_FOCUSED', label: '사실 중심' },
+  { value: 'EMOTION_EXPRESSIVE', label: '감정 표현적' },
+  { value: 'BALANCED', label: '균형적' },
 ];
 
 export default function App() {
-  // 모달 팝업 상태: 'none' (닫힘) | 'join' (회의 모달) | 'profile' (프로필 작성/수정 모달)
-  const [activeModal, setActiveModal] = useState('none');
+  const [activeModal, setActiveModal] = useState('none'); // 현재 열린 모달 종류(none/join/profile)
+  const [meetingTab, setMeetingTab] = useState('join'); // join 모달 안의 탭(참여하기/만들기)
+  const [meetingCode, setMeetingCode] = useState(''); // 참여 탭에서 사용자가 입력하는 회의 코드/링크
+  const [newMeetingTitle, setNewMeetingTitle] = useState(''); // API: MeetingCreateRequest.title (필수)
+  const [createdRoomCode, setCreatedRoomCode] = useState(''); // API: MeetingCreateData.share_url에 해당하는 값(지금은 목업)
+  const [maxParticipants, setMaxParticipants] = useState(4); // API: MeetingCreateRequest.max_participants (2~4, 기본 4)
 
-  // 회의 모달 내 탭 상태: 'join' (회의 참여) | 'create' (새 회의 만들기)
-  const [meetingTab, setMeetingTab] = useState('join');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // 회의 코드 및 새 회의 생성 데이터
-  const [meetingCode, setMeetingCode] = useState('');
-  const [newMeetingTitle, setNewMeetingTitle] = useState('');
-  const [createdRoomCode, setCreatedRoomCode] = useState('');
+  const [savedProfile, setSavedProfile] = useState(EMPTY_PROFILE); // "저장하고 돌아가기"를 눌러야만 갱신되는 실제 저장된 프로필
+  const [formData, setFormData] = useState(EMPTY_PROFILE); // 프로필 폼에서 편집 중인 임시 값(저장 전까지는 draft일 뿐)
 
-  // 사용자 프로필 데이터 (기본 빈 값)
-  const [formData, setFormData] = useState({
-    nickname: '',
-    country: '',
-    organization: '',
-    role: '',
-    language: '',
-    communicationStyle: '',
-  });
-
-  // 유효성 검사 에러 상태
+  const [countryQuery, setCountryQuery] = useState(''); // 국가 검색창에 실제로 입력/표시되는 문자열(국가명 검색용, 제출값인 코드와는 별개)
   const [errors, setErrors] = useState({});
-
-  // 국가 드롭다운 오픈 및 검색 목록 관리 상태
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const countryRef = useRef(null);
   const countryInputRef = useRef(null);
+  const [isEnglishProficiencyOpen, setIsEnglishProficiencyOpen] = useState(false); // 영어 숙련도 커스텀 드롭다운 열림 여부
+  const [isCommunicationStyleOpen, setIsCommunicationStyleOpen] = useState(false); // 소통 방식 커스텀 드롭다운 열림 여부
+  const englishProficiencyRef = useRef(null);
+  const communicationStyleRef = useRef(null);
+  const [profileSharingConsent, setProfileSharingConsent] = useState(false); // API: profile_sharing_consent - 반드시 true여야 입장 가능한 필수 동의
+  const [voiceAnalysisConsent, setVoiceAnalysisConsent] = useState(false); // API: voice_analysis_consent - F-03 음성 분석 사용 여부(선택 동의)
 
-  // 약관 동의 체크박스 상태 (기본값: false)
-  const [agreed, setAgreed] = useState(false);
+  const [uiLanguage, setUiLanguage] = useState('한국어');
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isMobileLangMenuOpen, setIsMobileLangMenuOpen] = useState(false);
+  const langMenuRef = useRef(null);
+  const mobileLangMenuRef = useRef(null);
 
-  // 드롭다운 바깥 영역 클릭 시 국가 드롭다운 닫기
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (countryRef.current && !countryRef.current.contains(event.target)) {
         setIsCountryOpen(false);
+      }
+      if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
+        setIsLangMenuOpen(false);
+      }
+      if (mobileLangMenuRef.current && !mobileLangMenuRef.current.contains(event.target)) {
+        setIsMobileLangMenuOpen(false);
+      }
+      if (englishProficiencyRef.current && !englishProficiencyRef.current.contains(event.target)) {
+        setIsEnglishProficiencyOpen(false);
+      }
+      if (communicationStyleRef.current && !communicationStyleRef.current.contains(event.target)) {
+        setIsCommunicationStyleOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 프로필 모달 열기 함수 (에러 상태 초기화 포함)
+  useEffect(() => {
+    if (activeModal !== 'none') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [activeModal]);
+
   const openProfileModal = () => {
+    // 편집을 마지막 저장 상태에서부터 다시 시작하도록 draft를 savedProfile로 동기화
+    setFormData(savedProfile);
+    setCountryQuery(getCountryName(savedProfile.country));
     setErrors({});
     setActiveModal('profile');
+    setIsMobileMenuOpen(false);
   };
 
-  // 모달 닫기 / 이전 모달 이동 처리 함수
   const handleCloseModal = () => {
     if (activeModal === 'profile') {
+      // 저장하지 않고 닫으면 편집 중이던 draft는 버리고 마지막 저장된 프로필로 되돌린다
+      setFormData(savedProfile);
+      setCountryQuery(getCountryName(savedProfile.country));
       setErrors({});
-      setActiveModal('join'); // 프로필 모달에서 ✕ 클릭 시 이전 회의 모달로 복귀
+      setActiveModal('join');
     } else {
+      // 모달을 완전히 닫을 때는 회의 참여/생성 관련 입력만 초기화한다 (저장된 프로필은 재사용을 위해 유지)
       setActiveModal('none');
+      setMeetingTab('join');
+      setMeetingCode('');
+      setNewMeetingTitle('');
+      setCreatedRoomCode('');
+      setMaxParticipants(4);
+      setProfileSharingConsent(false);
+      setVoiceAnalysisConsent(false);
     }
   };
 
-  // 새 회의 만들기 탭으로 이동할 때 랜덤 회의 코드 생성
   const handleTabChange = (tab) => {
     setMeetingTab(tab);
     if (tab === 'create' && !createdRoomCode) {
-      const randomCode = 'samepage-' + Math.floor(1000 + Math.random() * 9000);
-      setCreatedRoomCode(randomCode);
+      // 실제 연동 시에는 POST /meetings 응답의 share_url을 그대로 써야 함 - 지금은 meeting_path 형식(/meetings/{uuid})만 흉내낸 목업
+      const mockMeetingId = crypto.randomUUID();
+      setCreatedRoomCode(`${window.location.origin}/meetings/${mockMeetingId}`);
     }
   };
 
-  // 폼 입력 값 처리 (타핑 시 해당 필드의 에러 표시 해제)
+  // 국가 필드를 제외한 일반 텍스트/셀렉트 입력 공용 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -101,34 +165,27 @@ export default function App() {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: false }));
     }
+  };
 
-    // 국가 입력창 타핑 시 드롭다운 자동 열기
-    if (name === 'country') {
-      setIsCountryOpen(true);
+  // 국가 검색창 입력 핸들러 - 화면 표시용 countryQuery만 바꾸고, 실제 제출값(코드)은 목록에서 선택해야 채워짐
+  const handleCountryQueryChange = (e) => {
+    setCountryQuery(e.target.value);
+    setIsCountryOpen(true);
+    if (errors.country) {
+      setErrors((prev) => ({ ...prev, country: false }));
     }
   };
 
-  // 국가 항목 선택 시 처리
+  // 드롭다운에서 국가를 선택하면 코드(API 제출값)와 이름(화면 표시용)을 함께 반영
   const handleSelectCountry = (country) => {
     if (errors.country) {
       setErrors((prev) => ({ ...prev, country: false }));
     }
-
-    if (country === '직접 입력') {
-      setFormData((prev) => ({ ...prev, country: '' }));
-      setIsCountryOpen(false);
-      setTimeout(() => {
-        if (countryInputRef.current) {
-          countryInputRef.current.focus();
-        }
-      }, 50);
-    } else {
-      setFormData((prev) => ({ ...prev, country }));
-      setIsCountryOpen(false);
-    }
+    setFormData((prev) => ({ ...prev, country: country.code }));
+    setCountryQuery(country.name);
+    setIsCountryOpen(false);
   };
 
-  // 프로필 저장 및 검증 함수
   const handleSaveProfile = (e) => {
     e.preventDefault();
 
@@ -140,7 +197,8 @@ export default function App() {
       'country',
       'organization',
       'role',
-      'language',
+      'languages',
+      'englishProficiency',
       'communicationStyle',
     ];
 
@@ -157,57 +215,263 @@ export default function App() {
       return;
     }
 
+    setSavedProfile(formData); // "저장하고 돌아가기"를 눌러야만 draft가 실제 저장 상태로 반영됨
     setErrors({});
     setActiveModal('join');
   };
 
-  // 필터링된 국가 목록
+  // 검색창(countryQuery)에 입력된 문자열로 국가명을 필터링
   const filteredCountries = COUNTRY_LIST.filter((c) =>
-    c.toLowerCase().includes((formData.country || '').toLowerCase())
+    c.name.toLowerCase().includes(countryQuery.toLowerCase())
   );
 
   return (
     <div className="container">
-      {/* CSS 내장 스타일 주입 */}
-      <style>{cssStyles}</style>
+      {/* 부드러운 오오라 글로우 필드 */}
+      <div className="bg-glow-main" />
+      <div className="bg-glow-sub" />
 
       {/* 헤더 네비게이션 */}
       <header className="header">
-        <div className="logo">SamePage</div>
-        <div className="header-right">
-          <span className="header-link">회의</span>
-          <span className="header-link">도움말</span>
-          <div className="avatar">나</div>
+        <div className="header-inner">
+          <div className="logo-group">
+            <div className="logo-icon">L</div>
+            <span className="logo">(서비스 이름)</span>
+            <span className="badge"> (쓰는 ai 모델이름)</span>
+          </div>
+
+          <nav className="header-right desktop-only">
+            <span className="header-link">도움말</span>
+            <div className="lang-selector" ref={langMenuRef}>
+              <button
+                type="button"
+                className="header-start-btn"
+                onClick={() => setIsLangMenuOpen((prev) => !prev)}
+              >
+                {uiLanguage === '한국어' ? 'KR' : 'US'} {uiLanguage}
+              </button>
+
+              {isLangMenuOpen && (
+                <div className="lang-dropdown">
+                  <div
+                    className={`lang-option ${uiLanguage === '한국어' ? 'selected' : ''}`}
+                    onClick={() => {
+                      setUiLanguage('한국어');
+                      setIsLangMenuOpen(false);
+                    }}
+                  >
+                    KR 한국어
+                  </div>
+                  <div
+                    className={`lang-option ${uiLanguage === 'English' ? 'selected' : ''}`}
+                    onClick={() => {
+                      setUiLanguage('English');
+                      setIsLangMenuOpen(false);
+                    }}
+                  >
+                    US English
+                  </div>
+                </div>
+              )}
+            </div>
+          </nav>
+
+          <button
+            className="mobile-hamburger-btn mobile-only"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="메뉴 열기"
+          >
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
         </div>
+
+        {isMobileMenuOpen && (
+          <div className="mobile-drawer overlay-fade">
+            <div className="mobile-drawer-header">
+              <div className="mobile-search-box">
+                <span className="search-icon">🔍</span>
+                <input
+                  type="text"
+                  placeholder="검색 내용을 입력하세요..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="mobile-search-input"
+                />
+              </div>
+              <button
+                className="drawer-close-icon"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mobile-menu-list">
+              <div className="mobile-menu-item">도움말</div>
+              <div
+                className="mobile-menu-item lang-item"
+                ref={mobileLangMenuRef}
+                onClick={() => setIsMobileLangMenuOpen((prev) => !prev)}
+              >
+                {uiLanguage === '한국어' ? 'KR' : 'US'} {uiLanguage}
+
+                {isMobileLangMenuOpen && (
+                  <div className="mobile-lang-dropdown" onClick={(e) => e.stopPropagation()}>
+                    <div
+                      className={`mobile-lang-option ${uiLanguage === '한국어' ? 'selected' : ''}`}
+                      onClick={() => {
+                        setUiLanguage('한국어');
+                        setIsMobileLangMenuOpen(false);
+                      }}
+                    >
+                      KR 한국어
+                    </div>
+                    <div
+                      className={`mobile-lang-option ${uiLanguage === 'English' ? 'selected' : ''}`}
+                      onClick={() => {
+                        setUiLanguage('English');
+                        setIsMobileLangMenuOpen(false);
+                      }}
+                    >
+                      US English
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mobile-menu-actions">
+              <button
+                className="mobile-cta-btn primary"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setActiveModal('join');
+                  setMeetingTab('join');
+                }}
+              >
+                회의 시작하기
+              </button>
+              <button
+                className="mobile-cta-btn secondary"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setActiveModal('join');
+                  setMeetingTab('create');
+                }}
+              >
+                + 새 회의 개설하기
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* 메인 랜딩 영역 */}
+      {/* 메인 히어로 영역 */}
       <main className="main">
+        <div className="hero-capsule">
+          <span>전 세계 글로벌 팀을 위한 실시간 서포트 AI</span>
+        </div>
+
         <h1 className="main-title">
-          첫 글로벌 회의를<br />
-          더 편안하게 시작하세요
+          언어와 문화의 경계를 허무는<br />
+          <span className="gradient-text">글로벌 AI 회의</span>의 새로운 기준
         </h1>
+
         <p className="sub-title">
-          프로필은 회의마다 다시 입력하지 않습니다.<br />
-          가입 시 설정한 정보가 참여자에게 필요한 만큼만 공개됩니다.
+          실시간 음성 정제, 문화적 커뮤니케이션 매너 가이드, 사전 프로필 싱크로<br />
+          전 세계 팀원들과 마치 한 공간에 있는 것처럼 자연스럽고 오해 없이 소통하세요.
         </p>
 
-        <button
-          className="primary-button"
-          onClick={() => {
-            setActiveModal('join');
-            setMeetingTab('join');
-          }}
-        >
-          회의 시작하기 →
-        </button>
+        <div className="cta-group">
+          <button
+            className="primary-button"
+            onClick={() => {
+              setActiveModal('join');
+              setMeetingTab('join');
+            }}
+          >
+            지금 회의 입장하기
+          </button>
+
+          <button
+            className="secondary-button"
+            onClick={() => {
+              setActiveModal('join');
+              setMeetingTab('create');
+            }}
+          >
+            + 새 회의 개설하기 +
+          </button>
+        </div>
+
+        {/* 와이드 AI 모니터링 목업 카드 */}
+        <div className="preview-mockup">
+          <div className="mockup-header">
+            <div className="mockup-dots">
+              <span className="dot-red" />
+              <span className="dot-yellow" />
+              <span className="dot-green" />
+            </div>
+            <div className="mockup-title">AI Work PreView</div>
+            <div className="live-badge">
+              <span className="live-dot" />· LIVE REFINING ACTIVE
+            </div>
+          </div>
+
+          <div className="mockup-body">
+            <div className="mockup-col">
+              <div className="col-label">🎙️ 실시간 발언 보정 (Real-time Speech Sync)</div>
+              <div className="ai-translation-card">
+                <span className="tag">방금 감지한 발언</span>
+                <div className="speech-bubble-left">
+                  <div className="speaker-tag">KR glidong hong (FrontEnd)</div>
+                  <p>"That schedule is impossible."</p>
+                </div>
+                <div className="pre-speech-result-box">
+                  <div className="ai-header">
+                    <span>🤖 실시간 피드백</span>
+                  </div>
+                  <p className="ai-result">
+                    상대의 계획을 단정적으로 거절하는 표현으로 받아들여질 수 있습니다.
+                  </p>
+                  <div className="culture-note">
+                    💡 <strong>대안:</strong> Could we discuss an alternative schedule?
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mockup-col border-left">
+              <div className="col-label">✍️ 최적의 발언 추천 (Pre-Speech Assist)</div>
+
+              {/* F-02 목업: 발언 전에 한국어로 적어두면 영어 표현으로 변환해주는 기능 - 아직 실제 구현은 아님 */}
+              <div className="ai-translation-card">
+                <div className="ai-header">
+                  <span className="tag">🤖 발언 전 영어 변환</span>
+                </div>
+
+                <div className="pre-speech-input-box">
+                  <span className="pre-speech-label">내가 할 말 (한국어)</span>
+                  <p className="pre-speech-input-text">"이 부분은 마감 전에 한 번 더 확인해주시면 좋을 것 같아요."</p>
+                </div>
+                <div className="pre-speech-result-box">
+                  <span className="pre-speech-label result">추천 영어 표현</span>
+                  <p className="pre-speech-result-text">"It would be great if you could take one more look at this before the deadline."</p>
+                  <div className="culture-note">
+                    💡 <strong>추천 이유:</strong> 요청을 부드러운 제안 형태로 바꿔 상대가 부담 없이 받아들이도록 조정했습니다.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </main>
 
-      {/* 모달 팝업 오버레이 (바깥 클릭 시 안 닫힘) */}
+      {/* 모달 팝업 오버레이 */}
       {activeModal !== 'none' && (
         <div className="modal-backdrop">
           <div className="modal-card">
-            {/* 우측 상단 ✕ 닫기/뒤로가기 버튼 */}
             <button
               className="modal-close-btn"
               onClick={handleCloseModal}
@@ -215,10 +479,8 @@ export default function App() {
               ✕
             </button>
 
-            {/* 1. 회의 관련 모달 (참여하기 / 새 회의 만들기) */}
             {activeModal === 'join' && (
               <div>
-                {/* 회의 참여 / 새 회의 만들기 탭버튼 */}
                 <div className="tab-container">
                   <button
                     className={`tab-button ${meetingTab === 'join' ? 'active' : ''}`}
@@ -234,7 +496,6 @@ export default function App() {
                   </button>
                 </div>
 
-                {/* 1-A. 회의 참여하기 탭 */}
                 {meetingTab === 'join' && (
                   <div>
                     <p className="card-subtitle">저장된 프로필로 바로 입장합니다.</p>
@@ -245,55 +506,73 @@ export default function App() {
                         type="text"
                         value={meetingCode}
                         onChange={(e) => setMeetingCode(e.target.value)}
-                        placeholder="회의 코드 또는 링크를 입력해주세요"
+                        placeholder="공유받은 회의 링크를 입력해주세요"
                         className="input"
                       />
                     </div>
                   </div>
                 )}
 
-                {/* 1-B. 새 회의 만들기 탭 */}
                 {meetingTab === 'create' && (
                   <div>
                     <p className="card-subtitle">새로운 회의를 개설하고 전용 코드를 생성합니다.</p>
 
                     <div className="form-group">
-                      <label className="label">회의 주제 / 제목 (선택)</label>
+                      <label className="label">회의 주제 / 제목</label>
                       <input
                         type="text"
                         value={newMeetingTitle}
                         onChange={(e) => setNewMeetingTitle(e.target.value)}
-                        placeholder="예: 글로벌 마케팅 주간 회의"
+                        placeholder="예: 글로벌 마케팅 주간 회의 (필수)"
                         className="input"
                       />
                     </div>
 
                     <div className="form-group">
-                      <label className="label">자동 생성된 회의 코드</label>
+                      <label className="label">최대 참가 인원</label>
+                      <div className="participant-count-group">
+                        {[2, 3, 4].map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            className={`count-option ${maxParticipants === n ? 'active' : ''}`}
+                            onClick={() => setMaxParticipants(n)}
+                          >
+                            {n}명
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="label">생성된 공유 링크 (회의 코드)</label>
                       <div className="code-display-box">
                         <span className="code-text">{createdRoomCode}</span>
                         <button
                           className="copy-code-btn"
-                          onClick={() => alert('회의 코드가 복사되었습니다!')}
+                          onClick={() => alert('공유 링크가 복사되었습니다!')}
                         >
-                          코드 복사
+                          링크 복사
                         </button>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* 사용할 프로필 요약 박스 (공통) */}
                 <div className="profile-summary-box">
                   <div className="summary-label">사용할 프로필</div>
                   <div className="summary-name">
-                    {formData.nickname || '유다경'} · {formData.role || 'Project Manager'}
+                    {savedProfile.nickname.trim() ? savedProfile.nickname : '프로필을 입력해주세요'}
+                    {savedProfile.role.trim() && ` · ${savedProfile.role}`}
                   </div>
                   <div className="summary-details">
-                    {formData.country || '대한민국'} · {formData.language || '한국어 / 영어 중급'}
+                    {savedProfile.country ? getCountryName(savedProfile.country) : '국가 미지정'}
+                    {savedProfile.languages.trim() && ` · ${savedProfile.languages}`}
                   </div>
                   <div className="summary-details">
-                    {formData.communicationStyle || '균형적인 표현 선호'}
+                    {savedProfile.communicationStyle
+                      ? COMMUNICATION_STYLE_OPTIONS.find((o) => o.value === savedProfile.communicationStyle)?.label
+                      : '소통 방식 미지정'}
                   </div>
 
                   <button
@@ -304,29 +583,37 @@ export default function App() {
                   </button>
                 </div>
 
-                {/* 동의 체크박스 */}
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
-                    checked={agreed}
-                    onChange={(e) => setAgreed(e.target.checked)}
+                    checked={profileSharingConsent}
+                    onChange={(e) => setProfileSharingConsent(e.target.checked)}
                     className="checkbox"
                   />
-                  프로필 공개 및 내 음성 분석에 동의합니다.
+                  프로필 공개에 동의합니다. (필수)
                 </label>
 
-                {/* 입장 및 생성 버튼 */}
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={voiceAnalysisConsent}
+                    onChange={(e) => setVoiceAnalysisConsent(e.target.checked)}
+                    className="checkbox"
+                  />
+                  내 음성 분석(발언 피드백)에 동의합니다. (선택)
+                </label>
+
                 {meetingTab === 'join' ? (
-                  <button 
+                  <button
                     className="submit-button"
-                    disabled={!agreed || !meetingCode.trim()}
+                    disabled={!profileSharingConsent || !meetingCode.trim()}
                   >
                     회의 입장
                   </button>
                 ) : (
-                  <button 
+                  <button
                     className="submit-button"
-                    disabled={!agreed}
+                    disabled={!profileSharingConsent || !newMeetingTitle.trim()}
                   >
                     회의 생성 및 입장
                   </button>
@@ -334,13 +621,12 @@ export default function App() {
               </div>
             )}
 
-            {/* 2. 회원가입 및 프로필 작성/수정 모달 */}
             {activeModal === 'profile' && (
               <div>
                 <h2 className="card-title">회원가입 및 프로필</h2>
 
-                <form 
-                  onSubmit={handleSaveProfile} 
+                <form
+                  onSubmit={handleSaveProfile}
                   className="form"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -348,7 +634,6 @@ export default function App() {
                     }
                   }}
                 >
-                  {/* 이름 또는 닉네임 */}
                   <div className="field-group">
                     <div className="label-wrapper">
                       <label className="label">이름 또는 닉네임</label>
@@ -364,7 +649,6 @@ export default function App() {
                     />
                   </div>
 
-                  {/* 검색 가능한 국가 선택 드롭다운 영역 */}
                   <div className="field-group" ref={countryRef}>
                     <div className="label-wrapper">
                       <label className="label">국가</label>
@@ -374,12 +658,12 @@ export default function App() {
                       <input
                         ref={countryInputRef}
                         type="text"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleChange}
+                        name="countryQuery"
+                        value={countryQuery}
+                        onChange={handleCountryQueryChange}
                         onFocus={() => setIsCountryOpen(true)}
                         className={`input ${errors.country ? 'input-error' : ''}`}
-                        placeholder="국가 검색 또는 선택 (직접 입력 가능)"
+                        placeholder="국가 검색 (예: 대한민국, 미국)"
                         autoComplete="off"
                       />
                       <span className="dropdown-arrow">▼</span>
@@ -389,16 +673,16 @@ export default function App() {
                           {filteredCountries.length > 0 ? (
                             filteredCountries.map((c) => (
                               <div
-                                key={c}
-                                className={`country-option ${formData.country === c ? 'selected' : ''}`}
+                                key={c.code}
+                                className={`country-option ${formData.country === c.code ? 'selected' : ''}`}
                                 onClick={() => handleSelectCountry(c)}
                               >
-                                {c}
+                                {c.name}
                               </div>
                             ))
                           ) : (
                             <div className="country-no-result">
-                              검색 결과가 없습니다. (직접 입력 가능)
+                              목록에 있는 국가만 선택할 수 있어요 (API가 2자리 국가 코드만 허용)
                             </div>
                           )}
                         </div>
@@ -406,7 +690,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* 소속 조직 */}
                   <div className="field-group">
                     <div className="label-wrapper">
                       <label className="label">소속 조직</label>
@@ -422,7 +705,6 @@ export default function App() {
                     />
                   </div>
 
-                  {/* 직무 · 역할 */}
                   <div className="field-group">
                     <div className="label-wrapper">
                       <label className="label">직무 · 역할</label>
@@ -438,36 +720,99 @@ export default function App() {
                     />
                   </div>
 
-                  {/* 주 사용 언어 */}
                   <div className="field-group">
                     <div className="label-wrapper">
-                      <label className="label">주 사용 언어 / 영어 숙련도</label>
-                      {errors.language && <span className="error-text">입력해주세요</span>}
+                      <label className="label">사용 가능 언어 (쉼표로 구분)</label>
+                      {errors.languages && <span className="error-text">입력해주세요</span>}
                     </div>
                     <input
                       type="text"
-                      name="language"
-                      value={formData.language}
+                      name="languages"
+                      value={formData.languages}
                       onChange={handleChange}
-                      className={`input ${errors.language ? 'input-error' : ''}`}
-                      placeholder="주 사용 언어 입력"
+                      className={`input ${errors.languages ? 'input-error' : ''}`}
+                      placeholder="예: 한국어, 영어"
                     />
                   </div>
 
-                  {/* 선호 소통 방식 */}
-                  <div className="field-group">
+                  <div className="field-group" ref={englishProficiencyRef}>
+                    <div className="label-wrapper">
+                      <label className="label">영어 숙련도</label>
+                      {errors.englishProficiency && <span className="error-text">입력해주세요</span>}
+                    </div>
+                    <div className="dropdown-wrapper">
+                      <div
+                        className={`input select-display ${errors.englishProficiency ? 'input-error' : ''}`}
+                        onClick={() => setIsEnglishProficiencyOpen((prev) => !prev)}
+                      >
+                        {formData.englishProficiency ? (
+                          ENGLISH_PROFICIENCY_OPTIONS.find((opt) => opt.value === formData.englishProficiency)?.label
+                        ) : (
+                          <span className="select-placeholder">선택해주세요</span>
+                        )}
+                      </div>
+                      <span className="dropdown-arrow">▼</span>
+
+                      {isEnglishProficiencyOpen && (
+                        <div className="country-dropdown-list">
+                          {ENGLISH_PROFICIENCY_OPTIONS.map((opt) => (
+                            <div
+                              key={opt.value}
+                              className={`country-option ${formData.englishProficiency === opt.value ? 'selected' : ''}`}
+                              onClick={() => {
+                                setFormData((prev) => ({ ...prev, englishProficiency: opt.value }));
+                                if (errors.englishProficiency) {
+                                  setErrors((prev) => ({ ...prev, englishProficiency: false }));
+                                }
+                                setIsEnglishProficiencyOpen(false);
+                              }}
+                            >
+                              {opt.label}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="field-group" ref={communicationStyleRef}>
                     <div className="label-wrapper">
                       <label className="label">선호 소통 방식</label>
                       {errors.communicationStyle && <span className="error-text">입력해주세요</span>}
                     </div>
-                    <input
-                      type="text"
-                      name="communicationStyle"
-                      value={formData.communicationStyle}
-                      onChange={handleChange}
-                      className={`input ${errors.communicationStyle ? 'input-error' : ''}`}
-                      placeholder="선호 소통 방식 입력"
-                    />
+                    <div className="dropdown-wrapper">
+                      <div
+                        className={`input select-display ${errors.communicationStyle ? 'input-error' : ''}`}
+                        onClick={() => setIsCommunicationStyleOpen((prev) => !prev)}
+                      >
+                        {formData.communicationStyle ? (
+                          COMMUNICATION_STYLE_OPTIONS.find((opt) => opt.value === formData.communicationStyle)?.label
+                        ) : (
+                          <span className="select-placeholder">선택해주세요</span>
+                        )}
+                      </div>
+                      <span className="dropdown-arrow">▼</span>
+
+                      {isCommunicationStyleOpen && (
+                        <div className="country-dropdown-list">
+                          {COMMUNICATION_STYLE_OPTIONS.map((opt) => (
+                            <div
+                              key={opt.value}
+                              className={`country-option ${formData.communicationStyle === opt.value ? 'selected' : ''}`}
+                              onClick={() => {
+                                setFormData((prev) => ({ ...prev, communicationStyle: opt.value }));
+                                if (errors.communicationStyle) {
+                                  setErrors((prev) => ({ ...prev, communicationStyle: false }));
+                                }
+                                setIsCommunicationStyleOpen(false);
+                              }}
+                            >
+                              {opt.label}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <button type="submit" className="submit-button">
@@ -482,434 +827,3 @@ export default function App() {
     </div>
   );
 }
-
-const cssStyles = `
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #ffffff;
-  color: #111827;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-.container {
-  width: 100vw;
-  min-height: 100vh;
-  background-color: #ffffff;
-  color: #111827;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-.header {
-  width: 100%;
-  height: 64px;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo {
-  font-size: 20px;
-  font-weight: 800;
-  color: #111827;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.header-link {
-  font-size: 14px;
-  color: #6b7280;
-  cursor: pointer;
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.main {
-  flex: 1;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 80px 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.main-title {
-  font-size: 42px;
-  font-weight: 800;
-  line-height: 1.25;
-  color: #111827;
-  margin-bottom: 24px;
-}
-
-.sub-title {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #6b7280;
-  margin-bottom: 40px;
-}
-
-.primary-button {
-  padding: 16px 36px;
-  background-color: #1f2937;
-  color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.primary-button:hover {
-  background-color: #111827;
-  transform: translateY(-2px);
-}
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.modal-card {
-  width: 100%;
-  max-width: 480px;
-  background-color: #ffffff;
-  border-radius: 20px;
-  padding: 28px 32px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  position: relative;
-  max-height: 88vh;
-  overflow-y: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.modal-card::-webkit-scrollbar {
-  display: none;
-}
-
-.modal-close-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: #9ca3af;
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-}
-
-.modal-close-btn:hover {
-  color: #111827;
-}
-
-/* 탭 스타일 */
-.tab-container {
-  display: flex;
-  gap: 12px;
-  border-bottom: 2px solid #f3f4f6;
-  margin-bottom: 12px;
-  margin-top: 4px;
-}
-
-.tab-button {
-  background: none;
-  border: none;
-  padding: 8px 4px;
-  font-size: 18px;
-  font-weight: 800;
-  color: #9ca3af;
-  cursor: pointer;
-  position: relative;
-  transition: color 0.15s ease;
-}
-
-.tab-button.active {
-  color: #111827;
-}
-
-.tab-button.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: #111827;
-}
-
-/* 코드 생성 표시 박스 */
-.code-display-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 8px 12px;
-}
-
-.code-text {
-  font-family: monospace;
-  font-size: 15px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.copy-code-btn {
-  background-color: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.card-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: #111827;
-  margin-top: 0;
-  margin-bottom: 6px;
-}
-
-.card-subtitle {
-  font-size: 13px;
-  color: #6b7280;
-  margin-bottom: 16px;
-  margin-top: 0;
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  position: relative;
-}
-
-.label-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #374151;
-  margin-bottom: 4px;
-  display: block;
-}
-
-.error-text {
-  font-size: 11px;
-  font-weight: 700;
-  color: #ef4444;
-}
-
-.input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 13px;
-  color: #1f2937;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-
-.input:focus {
-  border-color: #1f2937;
-}
-
-.input.input-error {
-  border-color: #ef4444 !important;
-  background-color: #fef2f2;
-}
-
-.dropdown-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.dropdown-arrow {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 10px;
-  color: #9ca3af;
-  pointer-events: none;
-}
-
-.country-dropdown-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 160px;
-  overflow-y: auto;
-  background-color: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  margin-top: 4px;
-  z-index: 50;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.country-option {
-  padding: 8px 12px;
-  font-size: 12px;
-  color: #374151;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.country-option:hover {
-  background-color: #f3f4f6;
-  font-weight: 700;
-}
-
-.country-option.selected {
-  background-color: #f3f4f6;
-  font-weight: 800;
-  color: #111827;
-}
-
-.country-no-result {
-  padding: 10px 12px;
-  font-size: 12px;
-  color: #9ca3af;
-  text-align: center;
-}
-
-.profile-summary-box {
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 18px;
-}
-
-.summary-label {
-  font-size: 11px;
-  color: #6b7280;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.summary-name {
-  font-size: 15px;
-  font-weight: 800;
-  color: #111827;
-  margin-bottom: 4px;
-}
-
-.summary-details {
-  font-size: 12px;
-  color: #6b7280;
-  margin-bottom: 2px;
-}
-
-.edit-profile-button {
-  margin-top: 10px;
-  padding: 7px 14px;
-  background-color: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: #374151;
-  margin-bottom: 20px;
-  cursor: pointer;
-}
-
-.checkbox {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-.submit-button {
-  width: 100%;
-  padding: 13px;
-  background-color: #1f2937;
-  color: #ffffff;
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.submit-button:disabled {
-  background-color: #e5e7eb;
-  color: #9ca3af;
-  cursor: not-allowed;
-}
-`;
