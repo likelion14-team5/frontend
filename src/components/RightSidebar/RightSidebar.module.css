@@ -8,6 +8,9 @@
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   color: var(--color-text);
+
+  position: relative;
+  z-index: 1;
 }
 
 /* 패널이 두 개(표현변환 + 피드백) 다 켜져서 쌓일 때만 자동으로 구분선 생김 */
