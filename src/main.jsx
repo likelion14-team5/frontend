@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+<<<<<<< HEAD
 import App from './pages/mainPage.jsx'
 import MeetingRoom from './pages/MeetingRoom.jsx'
 
@@ -10,5 +11,13 @@ const Page = isMeetingRoute ? MeetingRoom : App;
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Page />
+=======
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+>>>>>>> main
   </StrictMode>,
 )
