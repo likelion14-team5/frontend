@@ -1,0 +1,110 @@
+.controlBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 10px 8px;
+  margin-top: 32px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.controlBtn {
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e5e7eb;
+  cursor: pointer;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+
+.controlBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.endCall {
+  color: #f87171;
+}
+
+.endCall:hover {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.off {
+  color: #f87171;
+}
+
+.confirmBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirmCard {
+  width: 90%;
+  max-width: 340px;
+  background-color: #ffffff;
+  color: #111827;
+  border-radius: 20px;
+  padding: 28px 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.confirmText {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 20px 0;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 10px;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background-color: #f3f4f6;
+}
+
+.confirmEndBtn {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 10px;
+  border: none;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.confirmEndBtn:hover {
+  opacity: 0.9;
+}

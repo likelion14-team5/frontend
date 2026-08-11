@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './index.css';
 import RightSidebar from '../components/RightSidebar/RightSidebar';
+import BottomBar from '../components/BottomBar/BottomBar';
 import { MEETING_PROFILE_STORAGE_KEY } from '../constants/meetingSession';
 
 // 회의방 화면 - "회의 입장" 이후 이동할 페이지.
@@ -36,6 +37,8 @@ export default function MeetingRoom() {
               전달받은 프로필이 없습니다. mainPage에서 "회의 입장"으로 들어와주세요.
             </p>
           )}
+
+          <BottomBar />
         </div>
 
         <RightSidebar
