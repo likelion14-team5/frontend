@@ -4,6 +4,8 @@ import HeaderBar from "../components/common/HeaderBar/HeaderBar";
 import ModeToggle from "../components/common/ModeToggle/ModeToggle";
 import RightSidebar from '../components/RightSidebar/RightSidebar';
 import { MEETING_PROFILE_STORAGE_KEY } from '../constants/meetingSession';
+import RightSidebar from '../components/RightSidebar/RightSidebar';
+import { MEETING_PROFILE_STORAGE_KEY } from '../constants/meetingSession';
 
 // 회의방 화면 - "회의 입장" 이후 이동할 페이지.
 // 상단 HeaderBar(토글 2개) + 우측 RightSidebar(발언 전 표현 변환 + 발언 직후 피드백)
@@ -26,29 +28,28 @@ export default function MeetingRoom() {
       <div className="bg-glow-main" />
       <div className="bg-glow-sub" />
 
-      <HeaderBar>
-        <div className="header-right-group">
-          <div className="header-toggle-group">
-            <ModeToggle
-              label="발언 직후 피드백"
-              isOn={feedbackOn}
-              onToggle={() => setFeedbackOn((v) => !v)}
-            />
-            <ModeToggle
-              label="발언 전 표현 변환"
-              isOn={expressionOn}
-              onToggle={() => setExpressionOn((v) => !v)}
-            />
+  <HeaderBar>
+          <div className="header-right-group">
+            <div className="header-toggle-group">
+              <ModeToggle
+                label="발언 직후 피드백"
+                isOn={feedbackOn}
+                onToggle={() => setFeedbackOn((v) => !v)}
+              />
+              <ModeToggle
+                label="발언 전 표현 변환"
+                isOn={expressionOn}
+                onToggle={() => setExpressionOn((v) => !v)}
+              />
+            </div>
+
+            <nav className="header-right">
+              <span className="header-link">회의</span>
+              <span className="header-link">도움말</span>
+              <div className="avatar">나</div>
+            </nav>
           </div>
-
-          <nav className="header-right">
-            <span className="header-link">회의</span>
-            <span className="header-link">도움말</span>
-            <div className="avatar">나</div>
-          </nav>
-        </div>
-      </HeaderBar>
-
+        </HeaderBar>
       <main style={{ display: 'flex', flex: 1 }}>
         <div className="main">
           <h1 className="main-title">회의방 (준비 중)</h1>
