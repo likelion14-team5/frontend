@@ -1,0 +1,41 @@
+.participant-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border: 1px solid #e6e6e4;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.participant-info-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.participant-info-meta {
+  font-size: 12.5px;
+  color: #8a8a8a;
+  margin-top: 4px;
+}
+
+.participant-info-detail-btn {
+  flex-shrink: 0;
+  background: #fff;
+  color: #1a1a1a;
+  border: 1px solid #dcdcda;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 아직 미구현 - disabled 상태임을 시각적 표시...... */
+.participant-info-detail-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
