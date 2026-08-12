@@ -1,0 +1,30 @@
+/* .header, .header-inner, .logo-group, .logo-icon, .logo, .header-right, .header-link 등은
+   index.css에 정의 */
+
+/* 토글 그룹 + 오른쪽 링크(회의/도움말/아바타)를 하나로 묶어서
+   header-inner의 space-between이 "로고 vs 나머지 전체" 두 덩어리로만 나뉘게 함. */
+
+.header-right-group {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.header-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15); /* 어두운 헤더 위에서도 구분되는 톤 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+}

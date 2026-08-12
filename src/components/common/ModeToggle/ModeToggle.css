@@ -1,0 +1,40 @@
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 4px;
+  font-family: inherit;
+}
+
+.mode-toggle-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.mode-toggle-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 0 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mode-toggle-pill.on {
+  background: #8b5cf6; /* 로고 아이콘과 같은 계열 보라색 */
+  color: #ffffff;
+}
+
+.mode-toggle-pill.off {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.6);
+}

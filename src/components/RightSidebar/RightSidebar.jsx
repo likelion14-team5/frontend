@@ -25,11 +25,11 @@ const MOCK_FEEDBACK = {
 /* ------------------------------------------------------------------ */
 
 export default function RightSidebar({
-  feedbackOn = true, // 기본값 true 설정
-  expressionOn = true, // 기본값 true 설정
-  participant = { name: "홍길동" }, // 기본값 설정
-  onCloseFeedback = () => {},
-}) {
+  feedbackOn = true,
+    expressionOn = true,
+    participant = { name: "홍길동" },
+    onCloseFeedback = () => {},
+  }) {
   const showNothing = !feedbackOn && !expressionOn;
 
   return (

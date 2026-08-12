@@ -1,11 +1,11 @@
 //npm run dev 서버 열기
 import React from 'react';
 import './index.css';
-import Header from '../components/Header';
-import Hero from '../components/Hero';
-import MeetingModal from '../components/MeetingModal';
-import JoinCreateForm from '../components/JoinCreateForm';
-import ProfileForm from '../components/ProfileForm';
+import Header from '../components/landing/Header';
+import Hero from '../components/landing/Hero';
+import MeetingModal from '../components/landing/MeetingModal';
+import JoinCreateForm from '../components/landing/JoinCreateForm';
+import ProfileForm from '../components/landing/ProfileForm';
 import { useMeetingModal } from '../hooks/useMeetingModal';
 import { useProfile } from '../hooks/useProfile';
 import { useGoToMeeting } from '../hooks/useGoToMeeting';
