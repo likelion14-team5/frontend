@@ -3,8 +3,6 @@ import './index.css';
 import HeaderBar from "../components/common/HeaderBar/HeaderBar";
 import ModeToggle from "../components/common/ModeToggle/ModeToggle";
 import RightSidebar from '../components/RightSidebar/RightSidebar';
-import { MEETING_PROFILE_STORAGE_KEY } from '../constants/meetingSession';
-import RightSidebar from '../components/RightSidebar/RightSidebar';
 import BottomBar from '../components/BottomBar/BottomBar';
 import { MEETING_PROFILE_STORAGE_KEY } from '../constants/meetingSession';
 
