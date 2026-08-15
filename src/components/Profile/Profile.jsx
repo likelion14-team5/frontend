@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import './Profile.css';
+import styles from './Profile.module.css';
+import { useDraggable } from '../ParticipantsPanel/useDraggable';
 import { API_ENDPOINTS, PARTICIPANT_TOKEN_KEY } from '../../constants/meetingSession';
 import {
   mapBackendProfileToFrontend,
@@ -8,9 +9,19 @@ import {
   getCommunicationStyleLabel,
 } from '../../constants/profileOptions';
 
-// 비디오 타일의 "프로필 상세보기"를 누르면 뜨는 참가자 프로필 팝업.
+// ISO 국가 코드(예: "KR") -> 국기 이모지. 유니코드 지역표시문자로 변환.
+function getFlagEmoji(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return '';
+  return [...countryCode.toUpperCase()]
+    .map((c) => String.fromCodePoint(127397 + c.charCodeAt(0)))
+    .join('');
+}
+
+// 비디오 타일의 "프로필 상세보기"를 누르면 뜨는 참가자 프로필 패널.
+// 전체 화면을 덮는 모달이 아니라, ParticipantsPanel과 같은 방식(드래그 가능한 플로팅 카드)으로 띄운다.
 // GET /meetings/{meetingId}/participants/{participantId}로 실제 프로필을 받아온다.
 export default function Profile({ meetingId, participantId, onClose }) {
+  const { position, handleMouseDown } = useDraggable({ x: 0, y: 0 });
   const [profile, setProfile] = useState(null);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,37 +62,49 @@ export default function Profile({ meetingId, participantId, onClose }) {
   }, [meetingId, participantId]);
 
   return (
-    <div className="profile-backdrop" onClick={onClose}>
-      <div className="profile-card" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="profile-close-btn" onClick={onClose}>
+    <div
+      className={styles.panel}
+      style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+    >
+      <div className={styles.header} onMouseDown={handleMouseDown}>
+        <span className={styles.title}>참가자 상세 프로필</span>
+        <button type="button" className={styles.closeBtn} onClick={onClose}>
           ✕
         </button>
+      </div>
 
-        {loading && <p className="profile-status">불러오는 중...</p>}
-        {error && <p className="profile-status">{error}</p>}
+      <div className={styles.body}>
+        {loading && <p className={styles.status}>불러오는 중...</p>}
+        {error && <p className={styles.status}>{error}</p>}
 
         {profile && !loading && !error && (
           <>
-            <div className="profile-name">
+            <div className={styles.name}>
               {profile.nickname || '이름 미지정'}
-              {role === 'HOST' && <span className="profile-host-badge">호스트</span>}
+              {role === 'HOST' && <span className={styles.hostBadge}>호스트</span>}
             </div>
-            <div className="profile-detail">
+
+            <div className={styles.countryBadge}>
+              <span className={styles.countryFlag}>{getFlagEmoji(profile.country)}</span>
+              {getCountryName(profile.country) || '국가 미지정'}
+            </div>
+
+            <div className={styles.detail}>
               {profile.organization || '소속 미지정'}
               {profile.role && ` · ${profile.role}`}
             </div>
-            <div className="profile-detail">
-              {getCountryName(profile.country) || '국가 미지정'}
-              {profile.languages && ` · ${profile.languages}`}
+
+            <div className={styles.sectionHeading}>언어 능력</div>
+            <div className={styles.detail}>주 사용 언어: {profile.languages || '미지정'}</div>
+            <div className={styles.detail}>
+              영어 실력: {getEnglishProficiencyLabel(profile.englishProficiency) || '미지정'}
             </div>
-            <div className="profile-detail">
-              {getEnglishProficiencyLabel(profile.englishProficiency) || '영어 숙련도 미지정'}
-              {' · '}
-              {getCommunicationStyleLabel(profile.communicationStyle) || '소통 방식 미지정'}
+            <div className={styles.detail}>
+              대화 방식: {getCommunicationStyleLabel(profile.communicationStyle) || '미지정'}
             </div>
-            {profile.additionalConsiderations && (
-              <div className="profile-note">💡 {profile.additionalConsiderations}</div>
-            )}
+            <div className={styles.note}>
+              참고사항: {profile.additionalConsiderations || '없음'}
+            </div>
           </>
         )}
       </div>
