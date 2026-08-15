@@ -35,7 +35,7 @@ export default function JoinCreateForm({
           className={`tab-button ${meetingTab === 'join' ? 'active' : ''}`}
           onClick={() => onTabChange('join')}
         >
-          회의에 참여하기
+          회의 입장하기
         </button>
         <button
           className={`tab-button ${meetingTab === 'create' ? 'active' : ''}`}
@@ -98,8 +98,22 @@ export default function JoinCreateForm({
             <div className="code-display-box">
               <span className="code-text">{createdRoomCode}</span>
               <button
+                type="button"
                 className="copy-code-btn"
-                onClick={() => alert('공유 링크가 복사되었습니다!')}
+                onClick={async () => {
+                  if (!createdRoomCode) return;
+                  try {
+                    await navigator.clipboard.writeText(createdRoomCode);
+                  } catch (err) {
+                    // HTTP/구형 브라우저 대응 Fallback
+                    const textarea = document.createElement('textarea');
+                    textarea.value = createdRoomCode;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                  }
+                }}
               >
                 링크 복사
               </button>

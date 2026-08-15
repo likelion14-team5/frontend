@@ -36,8 +36,7 @@ export default function MeetingRoom() {
     }
   }, []);
 
-  // participants.role (HOST/MEMBER) — 프로필의 job_title/"회의 역할" 같은 것과는
-  // 다른 필드다. 이름이 겹쳐 보여서 헷갈릴 수 있어 여기서 변수명을 isHost로 명확히 함.
+  // participants.role (HOST/MEMBER) — 프로필의 직무 같은 것과는 다른 필드로 isHost 변수 사용
   const isHost = meetingProfile?.profile?.role === 'HOST';
 
   return (
@@ -45,8 +44,6 @@ export default function MeetingRoom() {
       <div className="bg-glow-main" />
       <div className="bg-glow-sub" />
 
-      {/* callObject는 처음엔 null이고 연결되면 채워짐 — DailyProvider는 null도 받아들이는
-          공식 패턴이라 조건부로 마운트/언마운트할 필요 없이 이렇게 감싸도 된다. */}
       <DailyProvider callObject={callObject}>
         <HeaderBar>
           <div className="header-right-group">

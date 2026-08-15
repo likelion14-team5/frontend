@@ -34,7 +34,7 @@
   cursor: pointer;
 }
 
-/* 아직 미구현 - disabled 상태임을 시각적 표시...... */
+/* 아직 미구현 - disabled 상태임을 시각적 표시 */
 .participant-info-detail-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
