@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './ParticipantInfoBar.module.css';
 
 // props:
 //   participant - { name, country, role, englishLevel, communicationStyle, note }
@@ -9,15 +10,15 @@ export default function ParticipantInfoBar({ participant }) {
   if (!participant) return null;
 
   return (
-    <div className="participant-info-bar">
-      <div className="participant-info-text">
-        <div className="participant-info-name">{participant.name}</div>
-        <div className="participant-info-meta">
+    <div className={styles.participantInfoBar}>
+      <div className={styles.participantInfoText}>
+        <div className={styles.participantInfoName}>{participant.name}</div>
+        <div className={styles.participantInfoMeta}>
           {participant.country}
           {participant.role && ` · ${participant.role}`}
         </div>
         {participant.englishLevel && (
-          <div className="participant-info-meta">
+          <div className={styles.participantInfoMeta}>
             {participant.englishLevel}
             {participant.communicationStyle && ` | ${participant.communicationStyle}`}
           </div>
@@ -26,7 +27,7 @@ export default function ParticipantInfoBar({ participant }) {
 
       <button
         type="button"
-        className="participant-info-detail-btn"
+        className={styles.participantInfoDetailBtn}
         disabled
         title="프로필 상세 기능 준비 중입니다"
         onClick={() => {

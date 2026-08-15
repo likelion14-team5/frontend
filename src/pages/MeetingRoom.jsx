@@ -1,75 +1,110 @@
 import React, { useEffect, useState } from 'react';
+import { DailyProvider } from '@daily-co/daily-react';
 import './index.css';
 import HeaderBar from "../components/common/HeaderBar/HeaderBar";
 import ModeToggle from "../components/common/ModeToggle/ModeToggle";
 import RightSidebar from '../components/RightSidebar/RightSidebar';
+import BottomBar from '../components/BottomBar/BottomBar';
+import VideoGrid from '../components/VideoGrid/VideoGrid';
+import { useDailyCall } from '../hooks/useDailyCall';
 import { MEETING_PROFILE_STORAGE_KEY } from '../constants/meetingSession';
 
+// react-router-dom 없이 main.jsx가 pathname만 보고 페이지를 고르는 구조라
+// (main.jsx: isMeetingRoute ? MeetingRoom : App, 둘 다 prop 없이 렌더링됨)
+// meetingId는 여기서 URL 경로를 직접 파싱해서 구한다.
+function extractMeetingIdFromPath(pathname) {
+  const match = pathname.match(/\/meetings\/([^/]+)/);
+  return match ? match[1] : null;
+}
+
 // 회의방 화면 - "회의 입장" 이후 이동할 페이지.
-// 상단 HeaderBar(토글 2개) + 우측 RightSidebar(발언 전 표현 변환 + 발언 직후 피드백)
-// 아직 Jitsi 연동/참가자 목록/실제 AI 연동은 없음.
+// Daily 연결은 여기(page 최상단)에서 한 번만 만들고, DailyProvider로 HeaderBar 아래
+// 전체(VideoGrid + BottomBar + RightSidebar)를 감싸서 어디서든 daily-react 훅을 쓸 수 있게 한다.
 export default function MeetingRoom() {
+  const meetingId = extractMeetingIdFromPath(window.location.pathname);
+  const { callObject, joined, error } = useDailyCall(meetingId);
+
   const [meetingProfile, setMeetingProfile] = useState(null); // mainPage에서 sessionStorage로 넘어온 프로필
   const [feedbackOn, setFeedbackOn] = useState(true);
   const [expressionOn, setExpressionOn] = useState(true);
+  const [selectedParticipantId, setSelectedParticipantId] = useState(null); // "프로필상세" 클릭한 참가자
 
   useEffect(() => {
-    // 백엔드 연동 시 이 부분을 GET /meetings/{id} 호출로 교체하면 된다
     const raw = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
     if (raw) {
       setMeetingProfile(JSON.parse(raw));
     }
   }, []);
 
+  // participants.role (HOST/MEMBER) — 프로필의 job_title/"회의 역할" 같은 것과는
+  // 다른 필드다. 이름이 겹쳐 보여서 헷갈릴 수 있어 여기서 변수명을 isHost로 명확히 함.
+  const isHost = meetingProfile?.profile?.role === 'HOST';
+
   return (
     <div className="container">
       <div className="bg-glow-main" />
       <div className="bg-glow-sub" />
 
-      <HeaderBar>
-        <div className="header-right-group">
-          <div className="header-toggle-group">
-            <ModeToggle
-              label="발언 직후 피드백"
-              isOn={feedbackOn}
-              onToggle={() => setFeedbackOn((v) => !v)}
-            />
-            <ModeToggle
-              label="발언 전 표현 변환"
-              isOn={expressionOn}
-              onToggle={() => setExpressionOn((v) => !v)}
-            />
+      {/* callObject는 처음엔 null이고 연결되면 채워짐 — DailyProvider는 null도 받아들이는
+          공식 패턴이라 조건부로 마운트/언마운트할 필요 없이 이렇게 감싸도 된다. */}
+      <DailyProvider callObject={callObject}>
+        <HeaderBar>
+          <div className="header-right-group">
+            <div className="header-toggle-group">
+              <ModeToggle
+                label="발언 직후 피드백"
+                isOn={feedbackOn}
+                onToggle={() => setFeedbackOn((v) => !v)}
+              />
+              <ModeToggle
+                label="발언 전 표현 변환"
+                isOn={expressionOn}
+                onToggle={() => setExpressionOn((v) => !v)}
+              />
+            </div>
+
+            <nav className="header-right">
+              <span className="header-link">회의</span>
+              <span className="header-link">도움말</span>
+              <div className="avatar">나</div>
+            </nav>
+          </div>
+        </HeaderBar>
+
+        <main style={{ display: 'flex', flex: 1 }}>
+          <div className="main">
+            {!meetingProfile && (
+              <p className="sub-title">
+                전달받은 프로필이 없습니다. mainPage에서 "회의 입장"으로 들어와주세요.
+              </p>
+            )}
+            {error && <p className="sub-title">연결 오류: {error}</p>}
+            {!callObject && !error && <p className="sub-title">연결 중...</p>}
+            {callObject && !joined && !error && <p className="sub-title">입장하는 중...</p>}
+
+            <VideoGrid onViewProfile={setSelectedParticipantId} />
+
+            <BottomBar isHost={isHost} />
           </div>
 
-          <nav className="header-right">
-            <span className="header-link">회의</span>
-            <span className="header-link">도움말</span>
-            <div className="avatar">나</div>
-          </nav>
-        </div>
-      </HeaderBar>
+          <RightSidebar
+            feedbackOn={feedbackOn}
+            expressionOn={expressionOn}
+            participant={{ name: meetingProfile?.profile?.nickname || '참가자' }}
+            onCloseFeedback={() => setFeedbackOn(false)}
+          />
+        </main>
+      </DailyProvider>
 
-      <main style={{ display: 'flex', flex: 1 }}>
-        <div className="main">
-          <h1 className="main-title">회의방 (준비 중)</h1>
-          <p className="sub-title">
-            여기에 Jitsi 화상회의, 참가자 목록 기능이 들어갈 예정입니다.
-          </p>
-
-          {!meetingProfile && (
-            <p className="sub-title">
-              전달받은 프로필이 없습니다. mainPage에서 "회의 입장"으로 들어와주세요.
-            </p>
-          )}
-        </div>
-
-        <RightSidebar
-          feedbackOn={feedbackOn}
-          expressionOn={expressionOn}
-          participant={{ name: meetingProfile?.profile?.nickname || '참가자' }}
-          onCloseFeedback={() => setFeedbackOn(false)}
-        />
-      </main>
+      {selectedParticipantId && (
+        // TODO: 실제 ParticipantsPanel로 교체 (드래그 가능한 상세 프로필)
+        // <ParticipantsPanel
+        //   meetingId={meetingId}
+        //   participantId={selectedParticipantId}
+        //   onClose={() => setSelectedParticipantId(null)}
+        // />
+        null
+      )}
     </div>
   );
 }

@@ -41,9 +41,9 @@ export default function App() {
     if (!submitBtn || submitBtn.disabled || activeModal !== 'join') return;
 
     if (meetingTab === 'join') {
-      goToMeeting(meetingCode, savedProfile, voiceAnalysisConsent);
+      goToMeeting(meetingCode, savedProfile, voiceAnalysisConsent, 'join');
     } else if (meetingTab === 'create') {
-      goToMeeting(createdRoomCode, savedProfile, voiceAnalysisConsent);
+      goToMeeting(createdRoomCode, savedProfile, voiceAnalysisConsent, 'create', newMeetingTitle, maxParticipants);
     }
   };
 
