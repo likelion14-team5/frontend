@@ -6,7 +6,7 @@ import { COMMUNICATION_STYLE_OPTIONS, getCountryName } from '../../constants/pro
 //   meetingCode, onMeetingCodeChange(value)               - 참여 탭 입력값
 //   newMeetingTitle, onTitleChange(value)                 - 생성 탭 입력값
 //   maxParticipants, onMaxParticipantsChange(n)           - 생성 탭 인원수
-//   createdRoomCode                                       - 생성된 공유 링크(목업)
+//   createdRoomCode                                       - 실제 생성된 공유 링크 (지금 흐름상 항상 빈 값)
 //   savedProfile                                          - 저장된 프로필 (요약 표시용)
 //   onEditProfile()                                       - "프로필 수정" 클릭 시 (App이 activeModal='profile'로 전환)
 //   profileSharingConsent, onProfileSharingConsentChange
@@ -94,30 +94,37 @@ export default function JoinCreateForm({
           </div>
 
           <div className="form-group">
-            <label className="label">생성된 공유 링크 (회의 코드)</label>
-            <div className="code-display-box">
-              <span className="code-text">{createdRoomCode}</span>
-              <button
-                type="button"
-                className="copy-code-btn"
-                onClick={async () => {
-                  if (!createdRoomCode) return;
-                  try {
-                    await navigator.clipboard.writeText(createdRoomCode);
-                  } catch (err) {
-                    // HTTP/구형 브라우저 대응 Fallback
-                    const textarea = document.createElement('textarea');
-                    textarea.value = createdRoomCode;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                  }
-                }}
-              >
-                링크 복사
-              </button>
-            </div>
+            <label className="label">공유 링크 (회의 코드)</label>
+            {createdRoomCode ? (
+              <div className="code-display-box">
+                <span className="code-text">{createdRoomCode}</span>
+                <button
+                  type="button"
+                  className="copy-code-btn"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(createdRoomCode);
+                    } catch (err) {
+                      // HTTP/구형 브라우저 대응 Fallback
+                      const textarea = document.createElement('textarea');
+                      textarea.value = createdRoomCode;
+                      document.body.appendChild(textarea);
+                      textarea.select();
+                      document.execCommand('copy');
+                      document.body.removeChild(textarea);
+                    }
+                  }}
+                >
+                  링크 복사
+                </button>
+              </div>
+            ) : (
+              // 실제 링크는 백엔드가 회의를 생성해야만 나온다. "회의 생성 및 입장"을 누르면
+              // 곧바로 회의방으로 이동하기 때문에 미리 보여줄 값이 없어 안내 문구만 표시한다.
+              <p className="card-subtitle" style={{ margin: 0 }}>
+                "회의 생성 및 입장"을 누르면 참가자와 공유할 수 있는 링크가 자동으로 발급됩니다.
+              </p>
+            )}
           </div>
         </div>
       )}

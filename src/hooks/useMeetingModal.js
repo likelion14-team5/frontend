@@ -20,10 +20,9 @@ export function useMeetingModal() {
   const openModal = (tab = 'join') => {
     setMeetingTab(tab);
     setActiveModal('join');
-    if (tab === 'create' && !createdRoomCode) {
-      const mockMeetingId = crypto.randomUUID();
-      setCreatedRoomCode(`${window.location.origin}/meetings/${mockMeetingId}`);
-    }
+    // createdRoomCode는 더 이상 여기서 미리 만들지 않는다.
+    // 실제 회의 생성(POST /meetings) 성공 시 백엔드가 내려주는 진짜 share_url을 써야 하므로
+    // 이 시점엔 비워둔 채로 두고, 생성 버튼을 눌러야 값이 채워지게 한다.
   };
 
   const closeModal = () => {
@@ -39,10 +38,7 @@ export function useMeetingModal() {
 
   const handleTabChange = (tab) => {
     setMeetingTab(tab);
-    if (tab === 'create' && !createdRoomCode) {
-      const mockMeetingId = crypto.randomUUID();
-      setCreatedRoomCode(`${window.location.origin}/meetings/${mockMeetingId}`);
-    }
+    // openModal과 동일하게, 진짜 회의가 생성되기 전까지는 가짜 링크를 만들지 않는다.
   };
 
   const openProfileModal = () => setActiveModal('profile');

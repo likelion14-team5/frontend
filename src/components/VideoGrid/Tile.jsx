@@ -32,7 +32,8 @@ function Tile({ participant, isLocal, onViewProfile }) {
       <ParticipantInfoBar
         participant={{
           id: participant.user_id,
-          display_name: participant.user_name || "참가자",
+          name: participant.user_name || "참가자",
+          role: participant.userData?.role || "",
         }}
         isSelf={isLocal}
         onViewProfile={onViewProfile}

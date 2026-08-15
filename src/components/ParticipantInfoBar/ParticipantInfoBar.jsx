@@ -2,21 +2,26 @@ import React from 'react';
 import styles from './ParticipantInfoBar.module.css';
 
 // props:
-//   participant - { name, country, role, englishLevel, communicationStyle, note }
-//
-// "프로필 상세보기" 버튼은 자리만 만들어둠.
-// TODO: 프로필 상세 컴포넌트 onClick에 연결
-export default function ParticipantInfoBar({ participant }) {
+//   participant   - { id, name, country, role, englishLevel, communicationStyle, note }
+//   isSelf        - 내 타일인지 여부 (이름 옆에 "(나)" 표시)
+//   onViewProfile - (participantId) => void, "프로필 상세보기" 클릭 시 호출
+export default function ParticipantInfoBar({ participant, isSelf, onViewProfile }) {
   if (!participant) return null;
 
   return (
     <div className={styles.participantInfoBar}>
       <div className={styles.participantInfoText}>
-        <div className={styles.participantInfoName}>{participant.name}</div>
-        <div className={styles.participantInfoMeta}>
-          {participant.country}
-          {participant.role && ` · ${participant.role}`}
+        <div className={styles.participantInfoName}>
+          {participant.name}
+          {isSelf && ' (나)'}
         </div>
+        {(participant.country || participant.role) && (
+          <div className={styles.participantInfoMeta}>
+            {participant.country}
+            {participant.country && participant.role && ' · '}
+            {participant.role}
+          </div>
+        )}
         {participant.englishLevel && (
           <div className={styles.participantInfoMeta}>
             {participant.englishLevel}
@@ -28,11 +33,7 @@ export default function ParticipantInfoBar({ participant }) {
       <button
         type="button"
         className={styles.participantInfoDetailBtn}
-        disabled
-        title="프로필 상세 기능 준비 중입니다"
-        onClick={() => {
-          // TODO: 프로필 상세 연결
-        }}
+        onClick={() => onViewProfile?.(participant.id)}
       >
         프로필 상세보기
       </button>
