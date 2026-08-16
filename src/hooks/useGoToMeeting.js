@@ -8,7 +8,10 @@ import { mapFrontendProfileToBackend } from '../constants/profileOptions';
 export function useGoToMeeting() {
   return async (url, profile, voiceAnalysisConsent, meetingTab = 'join', newMeetingTitle = '', maxParticipants = 4) => {
     try {
-      let meetingId = url.split('/').pop();
+      // 입력받은 url에서 순수 meetingId 추출 및 올바른 회의실 URL 경로 재설정
+      let meetingId = url.split('/').pop().split('?')[0];
+      const targetUrl = `/meetings/${meetingId}`;
+
       const backendProfile = mapFrontendProfileToBackend(profile);
 
       // 1. '새 회의 만들기' -> 방+회의+HOST를 한 번에 생성.
@@ -34,8 +37,6 @@ export function useGoToMeeting() {
 
         const createResult = await createResponse.json();
 
-        // meeting_id 필드명이 실제로 뭔지 확실치 않아서(이게 이번 undefined 버그의 원인)
-        // 여러 후보를 순서대로 시도하고, 다 없으면 조용히 넘어가지 않고 바로 에러를 던진다.
         const createdMeetingId =
           createResult.data.meeting_id ??
           createResult.data.id ??
@@ -48,22 +49,18 @@ export function useGoToMeeting() {
         }
 
         meetingId = createdMeetingId;
-        url = `/meetings/${meetingId}`;
 
-        // HOST는 이 응답에서 이미 participant_token을 받는다 (README: "참가자 opaque
-        // token 원문 1회 발급"). 그러니 아래 JOIN_MEETING을 또 호출할 필요가 없고,
-        // 호출하면 같은 이름으로 두 번째 참가자를 만들려다 충돌만 날 수 있다.
         sessionStorage.setItem(PARTICIPANT_TOKEN_KEY, createResult.data.participant_token);
         sessionStorage.setItem(
           MEETING_PROFILE_STORAGE_KEY,
           JSON.stringify({ profile, voiceAnalysisConsent })
         );
 
-        window.location.href = url;
+        window.location.href = `/meetings/${meetingId}`;
         return;
       }
 
-      // 2. 공유 링크로 들어온 '참가' 흐름
+      // 2. 공유 링크로 들어온 참가 흐름
       const response = await fetch(API_ENDPOINTS.JOIN_MEETING(meetingId), {
         method: 'POST',
         headers: {
@@ -90,8 +87,8 @@ export function useGoToMeeting() {
         JSON.stringify({ profile, voiceAnalysisConsent })
       );
 
-      // 4. 회의실 화면으로 이동
-      window.location.href = url;
+      // 4. 회의실 화면으로 이동 (명확한 상대 경로 /meetings/{id} 사용)
+      window.location.href = targetUrl;
     } catch (error) {
       console.error('[API 통신 에러]', error);
       alert('회의에 입장하는 중 서버와 통신 오류가 발생했습니다. 다시 시도해 주십시오.');

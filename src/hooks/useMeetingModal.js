@@ -20,10 +20,6 @@ export function useMeetingModal() {
   const openModal = (tab = 'join') => {
     setMeetingTab(tab);
     setActiveModal('join');
-    if (tab === 'create' && !createdRoomCode) {
-      const mockMeetingId = crypto.randomUUID();
-      setCreatedRoomCode(`${window.location.origin}/meetings/${mockMeetingId}`);
-    }
   };
 
   const closeModal = () => {
@@ -39,10 +35,6 @@ export function useMeetingModal() {
 
   const handleTabChange = (tab) => {
     setMeetingTab(tab);
-    if (tab === 'create' && !createdRoomCode) {
-      const mockMeetingId = crypto.randomUUID();
-      setCreatedRoomCode(`${window.location.origin}/meetings/${mockMeetingId}`);
-    }
   };
 
   const openProfileModal = () => setActiveModal('profile');

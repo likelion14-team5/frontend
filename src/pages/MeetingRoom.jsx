@@ -24,6 +24,24 @@ export default function MeetingRoom() {
   const meetingId = extractMeetingIdFromPath(window.location.pathname);
   const { callObject, joined, error } = useDailyCall(meetingId);
 
+  const [linkCopied, setLinkCopied] = useState(false);
+  const copyInviteLink = async () => {
+    if (!meetingId) return;
+    const link = `${window.location.origin}/meetings/${meetingId}`;
+    try {
+      await navigator.clipboard.writeText(link);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = link;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
   const [meetingProfile, setMeetingProfile] = useState(null); // mainPage에서 sessionStorage로 넘어온 프로필
   const [feedbackOn, setFeedbackOn] = useState(true);
   const [expressionOn, setExpressionOn] = useState(true);
@@ -36,7 +54,7 @@ export default function MeetingRoom() {
     }
   }, []);
 
-  // participants.role (HOST/MEMBER) — 프로필의 직무 같은 것과는 다른 필드로 isHost 변수 사용
+  // participants.role (HOST/MEMBER) — 프로필의 직무와는 다른 필드로 isHost 변수 사용
   const isHost = meetingProfile?.profile?.role === 'HOST';
 
   return (
@@ -78,6 +96,12 @@ export default function MeetingRoom() {
             {error && <p className="sub-title">연결 오류: {error}</p>}
             {!callObject && !error && <p className="sub-title">연결 중...</p>}
             {callObject && !joined && !error && <p className="sub-title">입장하는 중...</p>}
+
+            {meetingId && (
+              <button type="button" className="sub-title" onClick={copyInviteLink} style={{ cursor: 'pointer' }}>
+                {linkCopied ? '초대 링크가 복사됐습니다 ✓' : '초대 링크 복사'}
+              </button>
+            )}
 
             <VideoGrid onViewProfile={setSelectedParticipantId} />
 
