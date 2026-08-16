@@ -24,11 +24,11 @@ export default function Hero({ onOpenModal }) {
 
       <div className="cta-group">
         <button className="primary-button" onClick={() => onOpenModal('join')}>
-          지금 회의 입장하기
+          회의 입장하기
         </button>
 
         <button className="secondary-button" onClick={() => onOpenModal('create')}>
-          + 새 회의 개설하기 +
+          새 회의 만들기
         </button>
       </div>
 

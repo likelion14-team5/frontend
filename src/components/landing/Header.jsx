@@ -3,7 +3,7 @@ import { useClickOutside } from '../../hooks/useClickOutside';
 import HeaderBar from '../common/HeaderBar/HeaderBar';
 
 // props:
-//   onOpenModal(tab) - 모바일 메뉴의 "회의 시작하기" / "+ 새 회의 개설하기" 버튼에서 호출
+//   onOpenModal(tab) - 모바일 메뉴의 "회의 입장하기" / "+ 새 회의 만들기" 버튼에서 호출
 //                       tab은 'join' | 'create'
 export default function Header({ onOpenModal }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -85,7 +85,7 @@ export default function Header({ onOpenModal }) {
             onOpenModal('join');
           }}
         >
-          회의 시작하기
+          회의 입장하기
         </button>
         <button
           className="mobile-cta-btn secondary"
@@ -94,7 +94,7 @@ export default function Header({ onOpenModal }) {
             onOpenModal('create');
           }}
         >
-          + 새 회의 개설하기
+          + 새 회의 만들기
         </button>
       </div>
     </div>

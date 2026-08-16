@@ -40,10 +40,16 @@ export default function App() {
     const submitBtn = e.target.closest('.submit-button');
     if (!submitBtn || submitBtn.disabled || activeModal !== 'join') return;
 
+    // 프로필(닉네임)을 저장하지 않은 채로 회의에 들어가려는 경우를 막는다.
+    if (!savedProfile?.nickname) {
+      alert('프로필을 입력해야합니다.');
+      return;
+    }
+
     if (meetingTab === 'join') {
-      goToMeeting(meetingCode, savedProfile, voiceAnalysisConsent);
+      goToMeeting(meetingCode, savedProfile, voiceAnalysisConsent, 'join');
     } else if (meetingTab === 'create') {
-      goToMeeting(createdRoomCode, savedProfile, voiceAnalysisConsent);
+      goToMeeting(createdRoomCode, savedProfile, voiceAnalysisConsent, 'create', newMeetingTitle, maxParticipants);
     }
   };
 
