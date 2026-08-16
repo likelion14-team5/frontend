@@ -35,6 +35,7 @@ export function useMeetingModal() {
 
   const handleTabChange = (tab) => {
     setMeetingTab(tab);
+    // openModal과 동일하게, 진짜 회의가 생성되기 전까지는 가짜 링크를 만들지 않는다.
   };
 
   const openProfileModal = () => setActiveModal('profile');

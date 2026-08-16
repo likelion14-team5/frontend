@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Daily from "@daily-co/daily-js";
-import { PARTICIPANT_TOKEN_KEY, API_ENDPOINTS } from "../constants/meetingSession";
+import { PARTICIPANT_TOKEN_KEY, API_ENDPOINTS, MEETING_PROFILE_STORAGE_KEY } from "../constants/meetingSession";
 
 /**
  * Daily Call Object 연결 레이어. MeetingRoom(page) 최상단에서 한 번만 호출하고,
@@ -46,8 +46,17 @@ export function useDailyCall(meetingId) {
         co.on("left-meeting", () => !cancelled && setJoined(false));
         co.on("error", (e) => !cancelled && setError(e?.errorMsg ?? "연결 오류가 발생했습니다."));
 
+        // 직무(role)는 백엔드 API 없이, Daily의 userData로 참가자끼리 자동 공유되게 실어 보낸다.
+        // (join 시 userData를 넣으면 다른 참가자의 participant.userData로 그대로 전달됨)
+        const rawProfile = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
+        const myProfile = rawProfile ? JSON.parse(rawProfile).profile : null;
+
         setCallObject(co);
-        await co.join({ url: room_url, token: meeting_token });
+        await co.join({
+          url: room_url,
+          token: meeting_token,
+          userData: { role: myProfile?.role || "" },
+        });
       } catch (err) {
         if (!cancelled) setError(err.message);
       }

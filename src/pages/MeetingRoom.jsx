@@ -6,6 +6,7 @@ import ModeToggle from "../components/common/ModeToggle/ModeToggle";
 import RightSidebar from '../components/RightSidebar/RightSidebar';
 import BottomBar from '../components/BottomBar/BottomBar';
 import VideoGrid from '../components/VideoGrid/VideoGrid';
+import Profile from '../components/Profile/Profile';
 import { useDailyCall } from '../hooks/useDailyCall';
 import { MEETING_PROFILE_STORAGE_KEY } from '../constants/meetingSession';
 
@@ -118,13 +119,11 @@ export default function MeetingRoom() {
       </DailyProvider>
 
       {selectedParticipantId && (
-        // TODO: 실제 ParticipantsPanel로 교체 (드래그 가능한 상세 프로필)
-        // <ParticipantsPanel
-        //   meetingId={meetingId}
-        //   participantId={selectedParticipantId}
-        //   onClose={() => setSelectedParticipantId(null)}
-        // />
-        null
+        <Profile
+          meetingId={meetingId}
+          participantId={selectedParticipantId}
+          onClose={() => setSelectedParticipantId(null)}
+        />
       )}
     </div>
   );

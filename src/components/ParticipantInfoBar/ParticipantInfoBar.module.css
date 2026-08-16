@@ -1,41 +1,47 @@
-.participant-info-bar {
+/* 비디오 타일(.tile, position: relative) 위에 겹쳐지는 오버레이 바.
+   기존엔 position 지정이 없어서 일반 흐름으로 비디오 아래에 쌓이다가
+   .tile의 overflow: hidden에 잘려 화면에 안 보였음 -> absolute로 하단에 고정.
+   클래스명도 kebab-case였는데, 이 프로젝트의 vite 설정은 CSS Module 클래스명을
+   camelCase로 자동 변환해주지 않아서 styles.participantInfoBar가 계속 undefined였음
+   -> JSX에서 쓰는 이름 그대로 camelCase로 맞춤. */
+.participantInfoBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 20px;
-  background: #ffffff;
-  border: 1px solid #e6e6e4;
-  border-radius: 8px;
-  margin-top: 16px;
+  padding: 10px 14px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
 }
 
-.participant-info-name {
-  font-size: 15px;
+.participantInfoName {
+  font-size: 14px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #ffffff;
 }
 
-.participant-info-meta {
-  font-size: 12.5px;
-  color: #8a8a8a;
-  margin-top: 4px;
+.participantInfoMeta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 2px;
 }
 
-.participant-info-detail-btn {
+.participantInfoDetailBtn {
   flex-shrink: 0;
-  background: #fff;
-  color: #1a1a1a;
-  border: 1px solid #dcdcda;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
+  padding: 6px 12px;
+  font-size: 12.5px;
   font-weight: 500;
   cursor: pointer;
 }
 
-/* 아직 미구현 - disabled 상태임을 시각적 표시 */
-.participant-info-detail-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.participantInfoDetailBtn:hover {
+  background: rgba(255, 255, 255, 0.22);
 }
