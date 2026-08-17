@@ -89,19 +89,18 @@ export const mapBackendProfileToFrontend = (data) => {
  */
 export const mapFrontendProfileToBackend = (formData) => {
   return {
-    display_name: formData.nickname || '',
-    country_code: formData.country || '',
-    organization: formData.organization || '',
-    job_title: formData.role || '',
+    display_name: formData.nickname || '미지정',
+    country_code: formData.country || '미지정',
+    organization: formData.organization || '미지정',
+    job_title: formData.role || '미지정',
 
     // languages를 배열 형태로 변환
     languages: typeof formData.languages === 'string' 
       ? formData.languages.split(',').map((l) => l.trim()).filter(Boolean) 
       : (formData.languages || []),
       
-    english_proficiency: formData.englishProficiency || '',
-    communication_style: formData.communicationStyle || '',
-    // 빈 문자열일 경우 백엔드 에러(최소 1자 이상)를 피하기 위해 공백이나 기본 문구 처리
+    english_proficiency: formData.englishProficiency || '미지정',
+    communication_style: formData.communicationStyle || '미지정',
     additional_considerations: formData.additionalConsiderations?.trim() || '없음',
 
 

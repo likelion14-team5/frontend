@@ -80,27 +80,27 @@ export default function Profile({ meetingId, participantId, onClose }) {
         {profile && !loading && !error && (
           <>
             <div className={styles.name}>
-              {profile.nickname || '이름 미지정'}
+              {profile.nickname}
               {role === 'HOST' && <span className={styles.hostBadge}>호스트</span>}
             </div>
 
             <div className={styles.countryBadge}>
               <span className={styles.countryFlag}>{getFlagEmoji(profile.country)}</span>
-              {getCountryName(profile.country) || '국가 미지정'}
+              {getCountryName(profile.country)}
             </div>
 
             <div className={styles.detail}>
-              {profile.organization || '소속 미지정'}
+              {profile.organization}
               {profile.role && ` · ${profile.role}`}
             </div>
 
             <div className={styles.sectionHeading}>언어 능력</div>
-            <div className={styles.detail}>주 사용 언어: {profile.languages || '미지정'}</div>
+            <div className={styles.detail}>주 사용 언어: {profile.languages}</div>
             <div className={styles.detail}>
-              영어 실력: {getEnglishProficiencyLabel(profile.englishProficiency) || '미지정'}
+              영어 실력: {getEnglishProficiencyLabel(profile.englishProficiency)}
             </div>
             <div className={styles.detail}>
-              대화 방식: {getCommunicationStyleLabel(profile.communicationStyle) || '미지정'}
+              대화 방식: {getCommunicationStyleLabel(profile.communicationStyle)}
             </div>
             <div className={styles.note}>
               참고사항: {profile.additionalConsiderations || '없음'}
