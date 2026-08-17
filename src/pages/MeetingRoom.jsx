@@ -7,8 +7,13 @@ import RightSidebar from '../components/RightSidebar/RightSidebar';
 import BottomBar from '../components/BottomBar/BottomBar';
 import VideoGrid from '../components/VideoGrid/VideoGrid';
 import Profile from '../components/Profile/Profile';
+import MeetingInfoModal from '../components/common/HeaderBar/MeetingInfoModal';
 import { useDailyCall } from '../hooks/useDailyCall';
-import { MEETING_PROFILE_STORAGE_KEY } from '../constants/meetingSession';
+import { useClickOutside } from '../hooks/useClickOutside';
+import {
+  MEETING_PROFILE_STORAGE_KEY,
+  API_ENDPOINTS, PARTICIPANT_TOKEN_KEY,
+} from '../constants/meetingSession';
 
 // react-router-dom 없이 main.jsx가 pathname만 보고 페이지를 고르는 구조라
 // (main.jsx: isMeetingRoute ? MeetingRoom : App, 둘 다 prop 없이 렌더링됨)
@@ -24,6 +29,12 @@ function extractMeetingIdFromPath(pathname) {
 export default function MeetingRoom() {
   const meetingId = extractMeetingIdFromPath(window.location.pathname);
   const { callObject, joined, error } = useDailyCall(meetingId);
+
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const infoModalRef = React.useRef(null);
+  useClickOutside(infoModalRef, () => setShowInfoModal(false));
+
+  const [meetingInfo, setMeetingInfo] = useState(null);
 
   const [linkCopied, setLinkCopied] = useState(false);
   const copyInviteLink = async () => {
@@ -48,12 +59,34 @@ export default function MeetingRoom() {
   const [expressionOn, setExpressionOn] = useState(true);
   const [selectedParticipantId, setSelectedParticipantId] = useState(null); // "프로필상세" 클릭한 참가자
 
+  // 회의실 입장 시, 회의 컨텍스트(제목, 인원 등)를 백엔드에서 가져온다.
   useEffect(() => {
     const raw = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
     if (raw) {
       setMeetingProfile(JSON.parse(raw));
     }
+
+    if (!meetingId) return;
+
+    const fetchMeetingContext = async () => {
+      try {
+        const token = sessionStorage.getItem(PARTICIPANT_TOKEN_KEY);
+        const response = await fetch(API_ENDPOINTS.GET_MEETING_CONTEXT(meetingId), {
+          headers: { 'X-Participant-Token': token },
+        });
+        if (response.ok) {
+          const result = await response.json();
+          setMeetingInfo(result.data.meeting);
+        }
+      } catch (e) {
+        console.error('Failed to fetch meeting context', e);
+      }
+    };
+
+    fetchMeetingContext();
   }, []);
+
+  const toggleInfoModal = () => setShowInfoModal((prev) => !prev);
 
   // participants.role (HOST/MEMBER) — 프로필의 직무와는 다른 필드로 isHost 변수 사용
   const isHost = meetingProfile?.profile?.role === 'HOST';
@@ -80,7 +113,15 @@ export default function MeetingRoom() {
             </div>
 
             <nav className="header-right">
-              <span className="header-link">회의</span>
+              <div className="info-button-wrapper" ref={infoModalRef} style={{ position: 'relative' }}>
+                <button type="button" className="header-link" onClick={toggleInfoModal}>
+                  정보
+                </button>
+                {showInfoModal && (
+                  <MeetingInfoModal meetingInfo={meetingInfo} onCopyLink={copyInviteLink} linkCopied={linkCopied} />
+                )}
+              </div>
+
               <span className="header-link">도움말</span>
               <div className="avatar">나</div>
             </nav>
@@ -97,12 +138,6 @@ export default function MeetingRoom() {
             {error && <p className="sub-title">연결 오류: {error}</p>}
             {!callObject && !error && <p className="sub-title">연결 중...</p>}
             {callObject && !joined && !error && <p className="sub-title">입장하는 중...</p>}
-
-            {meetingId && (
-              <button type="button" className="sub-title" onClick={copyInviteLink} style={{ cursor: 'pointer' }}>
-                {linkCopied ? '초대 링크가 복사됐습니다 ✓' : '초대 링크 복사'}
-              </button>
-            )}
 
             <VideoGrid onViewProfile={setSelectedParticipantId} />
 
