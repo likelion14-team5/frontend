@@ -12,6 +12,7 @@
   "dependencies": {
     "@daily-co/daily-js": "^0.92.0",
     "@daily-co/daily-react": "^0.26.0",
+    "lucide-react": "^1.32.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

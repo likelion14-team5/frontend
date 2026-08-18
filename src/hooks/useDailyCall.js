@@ -49,13 +49,17 @@ export function useDailyCall(meetingId) {
         // 직무(role)는 백엔드 API 없이, Daily의 userData로 참가자끼리 자동 공유되게 실어 보낸다.
         // (join 시 userData를 넣으면 다른 참가자의 participant.userData로 그대로 전달됨)
         const rawProfile = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
-        const myProfile = rawProfile ? JSON.parse(rawProfile).profile : null;
+        const meetingProfile = rawProfile ? JSON.parse(rawProfile) : null;
+        const myProfile = meetingProfile?.profile;
 
         setCallObject(co);
         await co.join({
           url: room_url,
           token: meeting_token,
-          userData: { role: myProfile?.role || "" },
+          userData: {
+            role: myProfile?.role || "",
+            meetingRole: meetingProfile?.meetingRole || "MEMBER",
+          },
         });
       } catch (err) {
         if (!cancelled) setError(err.message);

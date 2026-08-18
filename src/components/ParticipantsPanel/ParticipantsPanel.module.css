@@ -29,6 +29,9 @@
 }
 
 .closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 24px;
   height: 24px;
   border-radius: 6px;
@@ -87,6 +90,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
   min-width: 0;
 }
 
@@ -99,4 +103,17 @@
   font-size: 11px;
   font-weight: 700;
   color: #6366f1;
+}
+
+.mediaStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: #374151;
+}
+
+.mediaIcon {
+  display: flex;
+  align-items: center;
 }

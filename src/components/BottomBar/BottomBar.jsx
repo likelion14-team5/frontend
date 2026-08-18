@@ -1,3 +1,4 @@
+import { Mic, MicOff, PhoneOff, Users, Video, VideoOff } from 'lucide-react';
 import styles from './BottomBar.module.css';
 import { useMic } from './useMic';
 import { useCamera } from './useCamera';
@@ -21,22 +22,36 @@ export default function BottomBar({ isHost = false }) {
           className={`${styles.controlBtn} ${micOn ? '' : styles.off}`}
           onClick={toggleMic}
         >
-          {micOn ? '🎙️ 마이크 ON' : '🔇 마이크 OFF'}
+          <span className={styles.buttonContent}>
+            {micOn ? <Mic size={18} aria-hidden="true" /> : <MicOff size={18} aria-hidden="true" />}
+            {micOn ? '마이크 ON' : '마이크 OFF'}
+          </span>
         </button>
         <button
           type="button"
           className={`${styles.controlBtn} ${cameraOn ? '' : styles.off}`}
           onClick={toggleCamera}
         >
-          {cameraOn ? '📷 카메라 ON' : '🚫 카메라 OFF'}
+          <span className={styles.buttonContent}>
+            {cameraOn ? <Video size={18} aria-hidden="true" /> : <VideoOff size={18} aria-hidden="true" />}
+            {cameraOn ? '카메라 ON' : '카메라 OFF'}
+          </span>
         </button>
-        <button type="button" className={styles.controlBtn} onClick={openPanel}>👥 참가자</button>
+        <button type="button" className={styles.controlBtn} onClick={openPanel}>
+          <span className={styles.buttonContent}>
+            <Users size={18} aria-hidden="true" />
+            참가자
+          </span>
+        </button>
         <button
           type="button"
           className={`${styles.controlBtn} ${styles.endCall}`}
           onClick={requestEnd}
         >
-          🔴 종료
+          <span className={styles.buttonContent}>
+            <PhoneOff size={18} aria-hidden="true" />
+            종료
+          </span>
         </button>
       </div>
 
