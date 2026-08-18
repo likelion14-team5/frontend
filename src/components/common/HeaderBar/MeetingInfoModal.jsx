@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from '../HeaderBar/MeetingInfoModal.module.css';
 
-export default function MeetingInfoModal({ meetingInfo, onCopyLink, linkCopied }) {
+export default function MeetingInfoModal({ meetingInfo, onCopyLink }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyClick = () => {
+    onCopyLink();
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  };
 
   const { title, current_participants, max_participants, created_at } = meetingInfo || {};
 
@@ -22,8 +31,8 @@ export default function MeetingInfoModal({ meetingInfo, onCopyLink, linkCopied }
           {current_participants ?? '...'} / {max_participants ?? '...'}
         </div>
       </div>
-      <button type="button" className={styles.copyButton} onClick={onCopyLink}>
-        {linkCopied ? '초대 링크가 복사됐습니다 ✓' : '초대 링크 복사'}
+      <button type="button" className={styles.copyButton} onClick={handleCopyClick}>
+        초대 링크 복사
       </button>
     </div>
   );

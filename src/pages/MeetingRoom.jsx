@@ -36,7 +36,6 @@ export default function MeetingRoom() {
 
   const [meetingInfo, setMeetingInfo] = useState(null);
 
-  const [linkCopied, setLinkCopied] = useState(false);
   const copyInviteLink = async () => {
     if (!meetingId) return;
     const link = `${window.location.origin}/meetings/${meetingId}`;
@@ -50,9 +49,7 @@ export default function MeetingRoom() {
       document.execCommand('copy');
       document.body.removeChild(textarea);
     }
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2000);
-  };
+    };
 
   const [meetingProfile, setMeetingProfile] = useState(null); // mainPage에서 sessionStorage로 넘어온 프로필
   const [feedbackOn, setFeedbackOn] = useState(true);
@@ -113,12 +110,15 @@ export default function MeetingRoom() {
             </div>
 
             <nav className="header-right">
-              <div className="info-button-wrapper" ref={infoModalRef} style={{ position: 'relative' }}>
-                <button type="button" className="header-link" onClick={toggleInfoModal}>
+              <div ref={infoModalRef} style={{ position: 'relative' }}>
+                <span className="header-link" onClick={toggleInfoModal} role="button" tabIndex={0}>
                   정보
-                </button>
+                </span>
                 {showInfoModal && (
-                  <MeetingInfoModal meetingInfo={meetingInfo} onCopyLink={copyInviteLink} linkCopied={linkCopied} />
+                  <MeetingInfoModal
+                    meetingInfo={meetingInfo}
+                    onCopyLink={copyInviteLink}
+                  />
                 )}
               </div>
 
