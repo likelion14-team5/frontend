@@ -1,5 +1,4 @@
 .sidePanel {
-  width: 340px;
   flex-shrink: 0;
   background: var(--color-surface, #ffffff);
   border: 1px solid var(--color-border);
@@ -9,8 +8,20 @@
     sans-serif;
   color: var(--color-text);
   position: relative;
-    z-index: 1;
-  }
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.resizeHandle {
+  position: absolute;
+  left: -4px;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 2;
+}
 
 /* 패널이 두 개(표현변환 + 피드백) 다 켜져서 쌓일 때만 자동으로 구분선 생김 */
 .sidePanel > * + * {

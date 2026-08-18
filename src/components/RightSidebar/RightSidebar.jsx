@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback, useEffect } from 'react';
 import styles from "./RightSidebar.module.css";
 import ExpressionPanel from "./ExpressionPanel";
 import FeedbackPanel from "./FeedbackPanel";
@@ -29,11 +29,50 @@ export default function RightSidebar({
     expressionOn = true,
     participant = { name: "홍길동" },
     onCloseFeedback = () => {},
-  }) {
+}) {
+  const [width, setWidth] = useState(340);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (!isResizing) return;
+      const newWidth = window.innerWidth - e.clientX;
+      if (newWidth >= 240 && newWidth <= 600) {
+        setWidth(newWidth);
+      }
+    },
+    [isResizing],
+  );
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, handleMouseMove, handleMouseUp]);
+
   const showNothing = !feedbackOn && !expressionOn;
 
   return (
-    <aside className={styles.sidePanel}>
+    <aside className={styles.sidePanel} style={{ width: `${width}px` }}>
+      <div className={styles.resizeHandle} onMouseDown={handleMouseDown} />
       {showNothing ? (
         <div className={styles.emptyState}>
           <p className={styles.emptyText}>
