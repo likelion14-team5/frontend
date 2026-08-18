@@ -53,7 +53,7 @@ export function useGoToMeeting() {
         sessionStorage.setItem(PARTICIPANT_TOKEN_KEY, createResult.data.participant_token);
         sessionStorage.setItem(
           MEETING_PROFILE_STORAGE_KEY,
-          JSON.stringify({ profile, voiceAnalysisConsent })
+          JSON.stringify({ profile, voiceAnalysisConsent, meetingRole: 'HOST' })
         );
 
         window.location.href = `/meetings/${meetingId}`;
@@ -82,9 +82,9 @@ export function useGoToMeeting() {
 
       // 3. 참가자 토큰 및 프로필 저장
       sessionStorage.setItem(PARTICIPANT_TOKEN_KEY, result.data.participant_token);
-      sessionStorage.setItem(
-        MEETING_PROFILE_STORAGE_KEY,
-        JSON.stringify({ profile, voiceAnalysisConsent })
+        sessionStorage.setItem(
+          MEETING_PROFILE_STORAGE_KEY,
+          JSON.stringify({ profile, voiceAnalysisConsent, meetingRole: 'MEMBER' })
       );
 
       // 4. 회의실 화면으로 이동 (명확한 상대 경로 /meetings/{id} 사용)

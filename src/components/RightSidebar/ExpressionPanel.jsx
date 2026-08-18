@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styles from "./RightSidebar.module.css";
 
 export default function ExpressionPanel({

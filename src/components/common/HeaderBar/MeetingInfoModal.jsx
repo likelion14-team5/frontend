@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styles from '../HeaderBar/MeetingInfoModal.module.css';
 
 export default function MeetingInfoModal({ meetingInfo, onCopyLink }) {
@@ -32,7 +32,7 @@ export default function MeetingInfoModal({ meetingInfo, onCopyLink }) {
         </div>
       </div>
       <button type="button" className={styles.copyButton} onClick={handleCopyClick}>
-        초대 링크 복사
+        {copied ? '복사됨' : '초대 링크 복사'}
       </button>
     </div>
   );

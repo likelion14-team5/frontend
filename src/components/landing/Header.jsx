@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import HeaderBar from '../common/HeaderBar/HeaderBar';
 

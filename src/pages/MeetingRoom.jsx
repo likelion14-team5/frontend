@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DailyProvider } from '@daily-co/daily-react';
 import './index.css';
 import HeaderBar from "../components/common/HeaderBar/HeaderBar";
@@ -31,7 +31,7 @@ export default function MeetingRoom() {
   const { callObject, joined, error } = useDailyCall(meetingId);
 
   const [showInfoModal, setShowInfoModal] = useState(false);
-  const infoModalRef = React.useRef(null);
+  const infoModalRef = useRef(null);
   useClickOutside(infoModalRef, () => setShowInfoModal(false));
 
   const [meetingInfo, setMeetingInfo] = useState(null);
@@ -49,20 +49,18 @@ export default function MeetingRoom() {
       document.execCommand('copy');
       document.body.removeChild(textarea);
     }
-    };
+  };
 
-  const [meetingProfile, setMeetingProfile] = useState(null); // mainPage에서 sessionStorage로 넘어온 프로필
+  const [meetingProfile] = useState(() => {
+    const raw = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }); // mainPage에서 sessionStorage로 넘어온 프로필
   const [feedbackOn, setFeedbackOn] = useState(true);
   const [expressionOn, setExpressionOn] = useState(true);
   const [selectedParticipantId, setSelectedParticipantId] = useState(null); // "프로필상세" 클릭한 참가자
 
   // 회의실 입장 시, 회의 컨텍스트(제목, 인원 등)를 백엔드에서 가져온다.
   useEffect(() => {
-    const raw = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
-    if (raw) {
-      setMeetingProfile(JSON.parse(raw));
-    }
-
     if (!meetingId) return;
 
     const fetchMeetingContext = async () => {
@@ -81,12 +79,12 @@ export default function MeetingRoom() {
     };
 
     fetchMeetingContext();
-  }, []);
+  }, [meetingId]);
 
   const toggleInfoModal = () => setShowInfoModal((prev) => !prev);
 
-  // participants.role (HOST/MEMBER) — 프로필의 직무와는 다른 필드로 isHost 변수 사용
-  const isHost = meetingProfile?.profile?.role === 'HOST';
+  // profile.role은 직무이므로, 회의 권한은 별도 meetingRole 필드로 판별한다.
+  const isHost = meetingProfile?.meetingRole === 'HOST';
 
   return (
     <div className="container">

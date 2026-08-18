@@ -1,5 +1,4 @@
 //npm run dev 서버 열기
-import React from 'react';
 import './index.css';
 import Header from '../components/landing/Header';
 import Hero from '../components/landing/Hero';

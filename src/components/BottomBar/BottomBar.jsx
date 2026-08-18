@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './BottomBar.module.css';
 import { useMic } from './useMic';
 import { useCamera } from './useCamera';
@@ -8,7 +7,7 @@ import ParticipantsPanel from '../ParticipantsPanel/ParticipantsPanel';
 
 // 회의방 하단 컨트롤 바 (와이어프레임 S-05)
 // 마이크/카메라/종료/참가자 동작은 각각 전용 훅에서 담당하고, 이 파일은 그걸 조립해서 화면만 그린다.
-export default function BottomBar() {
+export default function BottomBar({ isHost = false }) {
   const { micOn, toggleMic } = useMic();
   const { cameraOn, toggleCamera } = useCamera();
   const { showEndConfirm, requestEnd, cancelEnd, confirmEnd } = useEndMeeting();
@@ -57,7 +56,7 @@ export default function BottomBar() {
         </div>
       )}
 
-      {isParticipantsOpen && <ParticipantsPanel onClose={closePanel} />}
+      {isParticipantsOpen && <ParticipantsPanel onClose={closePanel} isHost={isHost} />}
     </>
   );
 }

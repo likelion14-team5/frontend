@@ -1,4 +1,3 @@
-import React from 'react';
 import { COMMUNICATION_STYLE_OPTIONS, getCountryName } from '../../constants/profileOptions';
 
 // props:
@@ -6,7 +5,6 @@ import { COMMUNICATION_STYLE_OPTIONS, getCountryName } from '../../constants/pro
 //   meetingCode, onMeetingCodeChange(value)               - 참여 탭 입력값
 //   newMeetingTitle, onTitleChange(value)                 - 생성 탭 입력값
 //   maxParticipants, onMaxParticipantsChange(n)           - 생성 탭 인원수
-//   createdRoomCode                                       - (더 이상 미리 채워지지 않음. 참고 4 참조)
 //   savedProfile                                          - 저장된 프로필 (요약 표시용)
 //   onEditProfile()                                       - "프로필 수정" 클릭 시 (App이 activeModal='profile'로 전환)
 //   profileSharingConsent, onProfileSharingConsentChange
@@ -20,7 +18,6 @@ export default function JoinCreateForm({
   onTitleChange,
   maxParticipants,
   onMaxParticipantsChange,
-  createdRoomCode,
   savedProfile,
   onEditProfile,
   profileSharingConsent,

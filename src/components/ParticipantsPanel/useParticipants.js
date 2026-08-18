@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { MEETING_PROFILE_STORAGE_KEY } from '../../constants/meetingSession';
 
 // 실제로는 GET /meetings/{id}/participants 폴링으로 대체될 목업 참가자 목록.
@@ -8,19 +8,22 @@ const MOCK_OTHER_PARTICIPANTS = [
   { name: 'Lucas', role: 'UX' },
 ];
 
-export function useParticipants() {
-  const [participants, setParticipants] = useState([]);
-
-  useEffect(() => {
+export function useParticipants(isHost) {
+  const [participants] = useState(() => {
     const raw = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
     const me = raw ? JSON.parse(raw).profile : null;
 
-    const list = [
-      ...(me?.nickname ? [{ name: me.nickname, role: me.role || '' }] : []),
+    return [
+      ...(me?.nickname
+        ? [{
+            name: me.nickname,
+            role: me.role || '',
+            meetingRole: isHost ? 'HOST' : 'MEMBER',
+          }]
+        : []),
       ...MOCK_OTHER_PARTICIPANTS,
     ];
-    setParticipants(list);
-  }, []);
+  });
 
   return { participants };
 }
