@@ -1,5 +1,6 @@
 import { useParticipant, useParticipantIds } from '@daily-co/daily-react';
 import { Mic, MicOff, Video, VideoOff, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import styles from './ParticipantsPanel.module.css';
 import { useDraggable } from './useDraggable';
 
@@ -18,15 +19,14 @@ function ParticipantRow({ sessionId, isHost }) {
       <div className={styles.avatar}>{participant.user_name?.[0] || '?'}</div>
       <div className={styles.info}>
         <div className={styles.name}>{participant.user_name || '참가자'}</div>
-        <div className={styles.role}>{participant.userData?.role || ''}</div>
         {isParticipantHost && <span className={styles.host}>(호스트)</span>}
       </div>
       <div className={styles.mediaStatus} aria-label="미디어 상태">
         <span className={styles.mediaIcon} title={micOn ? '마이크 켜짐' : '마이크 꺼짐'} aria-label={micOn ? '마이크 켜짐' : '마이크 꺼짐'}>
-          {micOn ? <Mic size={18} /> : <MicOff size={18} />}
+          {micOn ? <Mic size={21} /> : <MicOff size={21} />}
         </span>
         <span className={styles.mediaIcon} title={cameraOn ? '카메라 켜짐' : '카메라 꺼짐'} aria-label={cameraOn ? '카메라 켜짐' : '카메라 꺼짐'}>
-          {cameraOn ? <Video size={18} /> : <VideoOff size={18} />}
+          {cameraOn ? <Video size={21} /> : <VideoOff size={21} />}
         </span>
       </div>
     </div>
@@ -39,7 +39,7 @@ export default function ParticipantsPanel({ onClose, isHost }) {
   const { position, handleMouseDown } = useDraggable({ x: 0, y: 0 });
   const participantIds = useParticipantIds();
 
-  return (
+  return createPortal(
     <div
       className={styles.panel}
       style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
@@ -56,6 +56,7 @@ export default function ParticipantsPanel({ onClose, isHost }) {
           <ParticipantRow key={sessionId} sessionId={sessionId} isHost={isHost} />
         ))}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

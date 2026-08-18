@@ -24,7 +24,7 @@ export default function BottomBar({ isHost = false }) {
         >
           <span className={styles.buttonContent}>
             {micOn ? <Mic size={18} aria-hidden="true" /> : <MicOff size={18} aria-hidden="true" />}
-            {micOn ? '마이크 ON' : '마이크 OFF'}
+            마이크
           </span>
         </button>
         <button
@@ -34,7 +34,7 @@ export default function BottomBar({ isHost = false }) {
         >
           <span className={styles.buttonContent}>
             {cameraOn ? <Video size={18} aria-hidden="true" /> : <VideoOff size={18} aria-hidden="true" />}
-            {cameraOn ? '카메라 ON' : '카메라 OFF'}
+            카메라
           </span>
         </button>
         <button type="button" className={styles.controlBtn} onClick={openPanel}>

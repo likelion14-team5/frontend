@@ -46,7 +46,7 @@ export function useDailyCall(meetingId) {
         co.on("left-meeting", () => !cancelled && setJoined(false));
         co.on("error", (e) => !cancelled && setError(e?.errorMsg ?? "연결 오류가 발생했습니다."));
 
-        // 직무(role)는 백엔드 API 없이, Daily의 userData로 참가자끼리 자동 공유되게 실어 보낸다.
+        // 요약 프로필 정보는 백엔드 API 없이, Daily의 userData로 참가자끼리 자동 공유되게 실어 보낸다.
         // (join 시 userData를 넣으면 다른 참가자의 participant.userData로 그대로 전달됨)
         const rawProfile = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
         const meetingProfile = rawProfile ? JSON.parse(rawProfile) : null;
@@ -58,6 +58,8 @@ export function useDailyCall(meetingId) {
           token: meeting_token,
           userData: {
             role: myProfile?.role || "",
+            country: myProfile?.country || "",
+            englishProficiency: myProfile?.englishProficiency || "",
             meetingRole: meetingProfile?.meetingRole || "MEMBER",
           },
         });
