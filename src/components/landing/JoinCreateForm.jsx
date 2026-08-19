@@ -100,11 +100,8 @@ export default function JoinCreateForm({
             </div>
           </div>
 
-          {/* 회의는 "회의 생성 및 입장"을 눌러야 실제로 만들어짐 (이 시점에선 공유 링크가 없음)
-              이전은 crypto.randomUUID()로 가짜 링크를 보여줬는데 혼돈이 있어 수정
-              (TODO: 이후 보완 필요) */}
           <div className="form-group">
-            <label className="label">공유 링크 안내</label>
+            <label className="label">초대 링크</label>
             <div className="code-display-box">
               <span className="code-text">
                 회의를 생성하면 회의 화면에서 초대 링크를 복사할 수 있어요.
@@ -154,7 +151,13 @@ export default function JoinCreateForm({
           onChange={(e) => onVoiceAnalysisConsentChange(e.target.checked)}
           className="checkbox"
         />
-        내 음성 분석(발언 피드백)에 동의합니다. (선택)
+
+        <div>
+          <div>내 음성 분석(발언 피드백)에 동의합니다. (선택)</div>
+          <span className="checkbox-description">
+            비동의 시 일부 기능 이용이 제한될 수 있습니다.
+          </span>
+        </div>
       </label>
 
       {meetingTab === 'join' ? (

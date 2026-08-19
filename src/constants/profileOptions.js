@@ -40,15 +40,10 @@ try {
 }
 
 export const COUNTRY_LIST = COUNTRY_CODES
-  .map((code) => {
-    let name = code;
-    try {
-      name = regionNames?.of(code) || code;
-    } catch {
-      name = code;
-    }
-    return { code, name };
-  })
+  .map((code) => ({
+    code,
+    name: regionNames ? regionNames.of(code) || code : code,
+  }))
   .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
 
 // formData.country(코드)로부터 화면에 보여줄 국가명을 역으로 찾는 헬퍼

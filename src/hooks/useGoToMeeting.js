@@ -63,10 +63,15 @@ export function useGoToMeeting() {
 
         meetingId = createdMeetingId;
 
-        sessionStorage.setItem(PARTICIPANT_TOKEN_KEY, createResult.data.participant_token);
+        sessionStorage.setItem(PARTICIPANT_TOKEN_KEY, createResult.data.participant_token || createResult.data.token);
         sessionStorage.setItem(
           MEETING_PROFILE_STORAGE_KEY,
-          JSON.stringify({ profile, voiceAnalysisConsent, meetingRole: 'HOST' })
+          JSON.stringify({ 
+            participantId: createResult.data.me?.id || createResult.data.participant_id || createResult.data.participant?.id,
+            profile, 
+            voiceAnalysisConsent, 
+            meetingRole: 'HOST' 
+          })
         );
 
         window.location.href = `/meetings/${meetingId}`;
@@ -93,10 +98,15 @@ export function useGoToMeeting() {
       const result = await response.json();
 
       // 3. 참가자 토큰 및 프로필 저장
-      sessionStorage.setItem(PARTICIPANT_TOKEN_KEY, result.data.participant_token);
-        sessionStorage.setItem(
-          MEETING_PROFILE_STORAGE_KEY,
-          JSON.stringify({ profile, voiceAnalysisConsent, meetingRole: 'MEMBER' })
+      sessionStorage.setItem(PARTICIPANT_TOKEN_KEY, result.data.participant_token || result.data.token);
+      sessionStorage.setItem(
+        MEETING_PROFILE_STORAGE_KEY,
+        JSON.stringify({ 
+          participantId: result.data.me?.id || result.data.participant_id || result.data.participant?.id,
+          profile, 
+          voiceAnalysisConsent, 
+          meetingRole: 'MEMBER' 
+        })
       );
 
       // 4. 회의실 화면으로 이동 (명확한 상대 경로 /meetings/{id} 사용)

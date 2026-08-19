@@ -12,7 +12,7 @@ import { useDailyCall } from '../hooks/useDailyCall';
 import { useClickOutside } from '../hooks/useClickOutside';
 import {
   MEETING_PROFILE_STORAGE_KEY,
-  API_ENDPOINTS, PARTICIPANT_TOKEN_KEY,
+  API_ENDPOINTS, PARTICIPANT_TOKEN_KEY
 } from '../constants/meetingSession';
 
 // react-router-dom 없이 main.jsx가 pathname만 보고 페이지를 고르는 구조라
@@ -61,6 +61,7 @@ export default function MeetingRoom() {
   const [feedbackOn, setFeedbackOn] = useState(voiceAnalysisConsent);
   const [expressionOn, setExpressionOn] = useState(true);
   const [selectedParticipantId, setSelectedParticipantId] = useState(null); // "프로필상세" 클릭한 참가자
+  const [feedbackTargetParticipantId, setFeedbackTargetParticipantId] = useState(null);
 
   // 회의실 입장 시, 회의 컨텍스트(제목, 인원 등)를 백엔드에서 가져온다.
   useEffect(() => {
@@ -76,6 +77,7 @@ export default function MeetingRoom() {
           const result = await response.json();
           setMeetingInfo(result.data.meeting);
         }
+
       } catch (e) {
         console.error('Failed to fetch meeting context', e);
       }
@@ -138,7 +140,7 @@ export default function MeetingRoom() {
                 -> 이 회의 코드를 그대로 실어서 랜딩의 "회의 입장" 모달로 보낸다. */}
             {!meetingProfile && (
               <div className="sub-title" style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-                <p>공유받은 회의 링크네요. 참가하려면 프로필을 먼저 입력해주세요.</p>
+                <p>참가하려면 프로필을 먼저 입력해주세요.</p>
                 <a href={`/?join=${meetingId}`} className="submit-button" style={{ textDecoration: 'none', display: 'inline-block' }}>
                   이 회의 참가하기
                 </a>
@@ -154,11 +156,14 @@ export default function MeetingRoom() {
           </div>
 
           <RightSidebar
+            initialInput=""
             feedbackOn={feedbackOn}
             expressionOn={expressionOn}
             participant={{ name: meetingProfile?.profile?.nickname || '참가자' }}
             onCloseFeedback={() => setFeedbackOn(false)}
             meetingId={meetingId}
+            feedbackTargetParticipantId={feedbackTargetParticipantId}
+            onChangeFeedbackTarget={setFeedbackTargetParticipantId}
           />
         </main>
       </DailyProvider>

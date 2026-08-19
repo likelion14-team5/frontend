@@ -10,6 +10,7 @@ export const PARTICIPANT_TOKEN_KEY = 'participant_token';
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export const API_ENDPOINTS = {
+  // [1~10] 회의 및 참가자 기본 엔드포인트
   CREATE_MEETING: `${API_BASE_URL}/meetings`,
   GET_PUBLIC_MEETING: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/public`,
   JOIN_MEETING: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/participants`,
@@ -21,8 +22,23 @@ export const API_ENDPOINTS = {
   UPDATE_MY_PROFILE: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/participants/me/profile`,
   LEAVE_MEETING: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/leave`,
   END_MEETING: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/end`,
-  // F-02(발언 전 표현 변환) - 백엔드가 OpenAI를 직접 호출하고 프론트는 결과만 받는다.
+
+  // [11] F-03 음성 분석 ON/OFF 토글
+  TOGGLE_VOICE_ANALYSIS: (meetingId) =>
+    `${API_BASE_URL}/meetings/${meetingId}/participants/me/voice-analysis`,
+
+  // [12~14] F-02 (발언 전 표현 변환)
   CREATE_PRE_SPEECH: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/pre-speech`,
+  GET_PRE_SPEECH: (meetingId, requestId) =>
+    `${API_BASE_URL}/meetings/${meetingId}/pre-speech/${requestId}`,
   REGENERATE_PRE_SPEECH: (meetingId, requestId) =>
     `${API_BASE_URL}/meetings/${meetingId}/pre-speech/${requestId}/regenerate`,
+
+  // [15~17] F-03 (발언 직후 피드백)
+  ANALYZE_SPEECH_FEEDBACK: (meetingId) =>
+    `${API_BASE_URL}/meetings/${meetingId}/speech-feedback/analyze`,
+  GET_SPEECH_FEEDBACK_LIST: (meetingId) =>
+    `${API_BASE_URL}/meetings/${meetingId}/speech-feedback`,
+  DISMISS_SPEECH_FEEDBACK: (meetingId, feedbackId) =>
+    `${API_BASE_URL}/meetings/${meetingId}/speech-feedback/${feedbackId}`,
 };

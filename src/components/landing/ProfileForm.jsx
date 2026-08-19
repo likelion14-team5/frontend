@@ -85,7 +85,7 @@ export default function ProfileForm({ initialProfile, onSave }) {
 
   return (
     <div>
-      <h2 className="card-title">회원가입 및 프로필</h2>
+      <h2 className="card-title">프로필 작성</h2>
 
       <form
         onSubmit={handleSubmit}

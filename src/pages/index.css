@@ -904,9 +904,10 @@ margin-bottom: 16px;
 
 .checkbox-label {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   font-size: 12px;
+  line-height: 1.5;
   color: #374151;
   margin-bottom: 16px;
   cursor: pointer;
@@ -915,8 +916,17 @@ margin-bottom: 16px;
 .checkbox {
   width: 16px;
   height: 16px;
+  margin-top: 2px;
   cursor: pointer;
   flex-shrink: 0;
+}
+
+.checkbox-description {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: #888;
 }
 
 .submit-button {
