@@ -29,6 +29,9 @@
 }
 
 .closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 24px;
   height: 24px;
   border-radius: 6px;
@@ -44,24 +47,24 @@
   background: rgba(255, 255, 255, 0.35);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  padding: 16px;
+.list {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px 16px;
   max-height: 60vh;
   overflow-y: auto;
 }
 
-.card {
+.participant {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 16px 12px;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.participant:last-child {
+  border-bottom: none;
 }
 
 .avatar {
@@ -83,7 +86,35 @@
   color: #111827;
 }
 
+.info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
 .role {
   font-size: 11px;
   color: #6b7280;
+}
+
+.host {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6366f1;
+}
+
+.mediaStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: 8px;
+  color: #374151;
+}
+
+.mediaIcon {
+  display: flex;
+  align-items: center;
 }

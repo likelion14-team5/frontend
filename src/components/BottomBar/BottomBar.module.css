@@ -24,6 +24,13 @@
   transition: background 0.15s;
 }
 
+.buttonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 .controlBtn:hover {
   background: rgba(255, 255, 255, 0.08);
 }

@@ -1,4 +1,3 @@
-import React from 'react';
 import { COMMUNICATION_STYLE_OPTIONS, getCountryName } from '../../constants/profileOptions';
 
 // props:
@@ -6,7 +5,6 @@ import { COMMUNICATION_STYLE_OPTIONS, getCountryName } from '../../constants/pro
 //   meetingCode, onMeetingCodeChange(value)               - 참여 탭 입력값
 //   newMeetingTitle, onTitleChange(value)                 - 생성 탭 입력값
 //   maxParticipants, onMaxParticipantsChange(n)           - 생성 탭 인원수
-//   createdRoomCode                                       - 생성된 공유 링크(목업)
 //   savedProfile                                          - 저장된 프로필 (요약 표시용)
 //   onEditProfile()                                       - "프로필 수정" 클릭 시 (App이 activeModal='profile'로 전환)
 //   profileSharingConsent, onProfileSharingConsentChange
@@ -20,7 +18,6 @@ export default function JoinCreateForm({
   onTitleChange,
   maxParticipants,
   onMaxParticipantsChange,
-  createdRoomCode,
   savedProfile,
   onEditProfile,
   profileSharingConsent,
@@ -35,7 +32,7 @@ export default function JoinCreateForm({
           className={`tab-button ${meetingTab === 'join' ? 'active' : ''}`}
           onClick={() => onTabChange('join')}
         >
-          회의에 참여하기
+          회의 입장하기
         </button>
         <button
           className={`tab-button ${meetingTab === 'create' ? 'active' : ''}`}
@@ -54,7 +51,17 @@ export default function JoinCreateForm({
             <input
               type="text"
               value={meetingCode}
-              onChange={(e) => onMeetingCodeChange(e.target.value)}
+              onChange={(e) => {
+                const rawValue = e.target.value.trim();
+
+                // 전체 URL이 들어온 경우 (예: http://localhost:5173/meetings/dfe928b7-...)
+                if (rawValue.includes('/meetings/')) {
+                  const extractedCode = rawValue.split('/meetings/').pop().split('?')[0];
+                  onMeetingCodeChange(extractedCode);
+                } else {
+                  onMeetingCodeChange(rawValue);
+                }
+              }}
               placeholder="공유받은 회의 링크를 입력해주세요"
               className="input"
             />
@@ -93,16 +100,15 @@ export default function JoinCreateForm({
             </div>
           </div>
 
+          {/* 회의는 "회의 생성 및 입장"을 눌러야 실제로 만들어짐 (이 시점에선 공유 링크가 없음)
+              이전은 crypto.randomUUID()로 가짜 링크를 보여줬는데 혼돈이 있어 수정
+              (TODO: 이후 보완 필요) */}
           <div className="form-group">
-            <label className="label">생성된 공유 링크 (회의 코드)</label>
+            <label className="label">공유 링크 안내</label>
             <div className="code-display-box">
-              <span className="code-text">{createdRoomCode}</span>
-              <button
-                className="copy-code-btn"
-                onClick={() => alert('공유 링크가 복사되었습니다!')}
-              >
-                링크 복사
-              </button>
+              <span className="code-text">
+                회의를 생성하면 회의 화면에서 초대 링크를 복사할 수 있어요.
+              </span>
             </div>
           </div>
         </div>

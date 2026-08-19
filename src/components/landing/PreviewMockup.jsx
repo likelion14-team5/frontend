@@ -1,4 +1,3 @@
-import React from 'react';
 
 // "AI Work PreView" 목업 카드. 지금은 전부 하드코딩된 정적 텍스트이며
 // 실제 회의 화면(RightSidebar 등)과는 연결되어 있지 않다.

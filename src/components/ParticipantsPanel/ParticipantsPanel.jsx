@@ -1,36 +1,62 @@
-import React from 'react';
+import { useParticipant, useParticipantIds } from '@daily-co/daily-react';
+import { Mic, MicOff, Video, VideoOff, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import styles from './ParticipantsPanel.module.css';
 import { useDraggable } from './useDraggable';
-import { useParticipants } from './useParticipants';
+
+function ParticipantRow({ sessionId, isHost }) {
+  const participant = useParticipant(sessionId);
+
+  if (!participant) return null;
+
+  const micOn = participant.audio === true;
+  const cameraOn = participant.video === true;
+  const isParticipantHost = participant.userData?.meetingRole === 'HOST'
+    || (participant.local && isHost);
+
+  return (
+    <div className={styles.participant}>
+      <div className={styles.avatar}>{participant.user_name?.[0] || '?'}</div>
+      <div className={styles.info}>
+        <div className={styles.name}>{participant.user_name || '참가자'}</div>
+        {isParticipantHost && <span className={styles.host}>(호스트)</span>}
+      </div>
+      <div className={styles.mediaStatus} aria-label="미디어 상태">
+        <span className={styles.mediaIcon} title={micOn ? '마이크 켜짐' : '마이크 꺼짐'} aria-label={micOn ? '마이크 켜짐' : '마이크 꺼짐'}>
+          {micOn ? <Mic size={21} /> : <MicOff size={21} />}
+        </span>
+        <span className={styles.mediaIcon} title={cameraOn ? '카메라 켜짐' : '카메라 꺼짐'} aria-label={cameraOn ? '카메라 켜짐' : '카메라 꺼짐'}>
+          {cameraOn ? <Video size={21} /> : <VideoOff size={21} />}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 // 참가자 프로필을 보여주는 플로팅 패널.
 // 브라우저 기본 드래그가 아니라 useDraggable로 직접 구현한 드래그 + 우상단 닫기(X) 버튼.
-// 참가자가 1명이면 카드 1개, 2명이면 2개 - 그리드가 자동으로 맞춰준다.
-export default function ParticipantsPanel({ onClose }) {
+export default function ParticipantsPanel({ onClose, isHost }) {
   const { position, handleMouseDown } = useDraggable({ x: 0, y: 0 });
-  const { participants } = useParticipants();
+  const participantIds = useParticipantIds();
 
-  return (
+  return createPortal(
     <div
       className={styles.panel}
       style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
     >
       <div className={styles.header} onMouseDown={handleMouseDown}>
-        <span className={styles.title}>참가자 ({participants.length})</span>
+        <span className={styles.title}>참가자 ({participantIds.length})</span>
         <button type="button" className={styles.closeBtn} onClick={onClose}>
-          ✕
+          <X size={16} aria-hidden="true" />
         </button>
       </div>
 
-      <div className={styles.grid}>
-        {participants.map((p, i) => (
-          <div key={i} className={styles.card}>
-            <div className={styles.avatar}>{p.name?.[0] || '?'}</div>
-            <div className={styles.name}>{p.name}</div>
-            <div className={styles.role}>{p.role}</div>
-          </div>
+      <div className={styles.list}>
+        {participantIds.map((sessionId) => (
+          <ParticipantRow key={sessionId} sessionId={sessionId} isHost={isHost} />
         ))}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

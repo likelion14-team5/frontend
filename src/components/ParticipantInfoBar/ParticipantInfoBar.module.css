@@ -1,0 +1,48 @@
+/* 비디오 타일 하단의 요약 프로필 영역 */
+.participantInfoBar {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: calc(100% - 20px);
+  padding: 8px 10px;
+  background: rgba(55, 65, 81, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+}
+
+.participantInfoText {
+  min-width: 0;
+}
+
+.participantInfoName {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.participantInfoMeta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.72);
+  margin-top: 4px;
+}
+
+.participantInfoDetailBtn {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.participantInfoDetailBtn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}

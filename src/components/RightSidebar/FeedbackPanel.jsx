@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./RightSidebar.module.css";
 
 export default function FeedbackPanel({ feedback, onClose }) {
