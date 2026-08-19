@@ -9,6 +9,11 @@
   font-family: inherit;
 }
 
+.mode-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .mode-toggle-label {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.85);

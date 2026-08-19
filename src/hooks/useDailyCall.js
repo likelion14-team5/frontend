@@ -60,7 +60,11 @@ export function useDailyCall(meetingId) {
             role: myProfile?.role || "",
             country: myProfile?.country || "",
             englishProficiency: myProfile?.englishProficiency || "",
+            communicationStyle: myProfile?.communicationStyle || "",
             meetingRole: meetingProfile?.meetingRole || "MEMBER",
+            // 참가자 카드에 "현지 시각"을 보여주기 위한 시간대(스펙 4.4) - 프로필 저장 시점이 아니라
+            // 지금 이 순간 이 브라우저의 시간대를 그대로 보낸다(둘이 어긋날 일이 없음).
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         });
       } catch (err) {

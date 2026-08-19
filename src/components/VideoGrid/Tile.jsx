@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useVideoTrack } from "@daily-co/daily-react";
 import ParticipantInfoBar from "../ParticipantInfoBar/ParticipantInfoBar";
-import { getCountryName, getEnglishProficiencyLabel } from "../../constants/profileOptions";
+import { getCountryName, getEnglishProficiencyLabel, getCommunicationStyleLabel } from "../../constants/profileOptions";
+import { useLocalTime } from "./useLocalTime";
 import styles from "./VideoGrid.module.css";
 
 /**
@@ -23,16 +24,28 @@ function Tile({ participant, isLocal, onViewProfile }) {
     }
   }, [videoTrack.state, videoTrack.persistentTrack]);
 
+  const name = participant.user_name || "참가자";
+  const cameraOff = videoTrack.state !== "playable";
+  const localTime = useLocalTime(participant.userData?.timezone);
+
   return (
     <div className={styles.tile}>
       <video ref={videoRef} autoPlay playsInline muted={isLocal} className={styles.video} />
+      {/* 카메라가 꺼져 있으면 까만 화면 대신 이니셜 아바타를 보여준다. */}
+      {cameraOff && (
+        <div className={styles.avatarFallback}>
+          <div className={styles.avatarCircle}>{name[0]}</div>
+        </div>
+      )}
       <ParticipantInfoBar
         participant={{
           id: participant.user_id,
-          name: participant.user_name || "참가자",
+          name,
           country: getCountryName(participant.userData?.country),
           role: participant.userData?.role || "",
           englishLevel: getEnglishProficiencyLabel(participant.userData?.englishProficiency),
+          communicationStyle: getCommunicationStyleLabel(participant.userData?.communicationStyle),
+          localTime,
         }}
         isSelf={isLocal}
         onViewProfile={onViewProfile}

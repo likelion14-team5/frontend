@@ -1,24 +1,12 @@
 import { useState } from "react";
 import styles from "./RightSidebar.module.css";
+import { useExpressionTranslate } from "./useExpressionTranslate";
 
-export default function ExpressionPanel({
-  participant,
-  initialInput,
-  mockResult,
-}) {
+export default function ExpressionPanel({ participant, initialInput, meetingId }) {
   const [input, setInput] = useState(initialInput);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { result, loading, error, generate } = useExpressionTranslate(meetingId);
 
-  const handleGenerate = () => {
-    if (!input.trim()) return;
-    setLoading(true);
-    setResult(null);
-    setTimeout(() => {
-      setResult(mockResult);
-      setLoading(false);
-    }, 600);
-  };
+  const handleGenerate = () => generate(input);
 
   return (
     <section className={styles.panelBlock}>
@@ -45,6 +33,8 @@ export default function ExpressionPanel({
       >
         {loading ? "생성 중..." : "영어 표현 만들기"}
       </button>
+
+      {error && <p className={styles.resultNote}>⚠️ {error}</p>}
 
       {result && (
         <div className={styles.resultCard}>

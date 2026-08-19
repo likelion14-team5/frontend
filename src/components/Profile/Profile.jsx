@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './Profile.module.css';
 import { useDraggable } from '../ParticipantsPanel/useDraggable';
+import { useLocalTime } from '../VideoGrid/useLocalTime';
 import { API_ENDPOINTS, PARTICIPANT_TOKEN_KEY } from '../../constants/meetingSession';
 import {
   mapBackendProfileToFrontend,
@@ -26,6 +27,7 @@ export default function Profile({ meetingId, participantId, onClose }) {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const localTime = useLocalTime(profile?.timezone);
 
   useEffect(() => {
     if (!meetingId || !participantId) return;
@@ -87,6 +89,7 @@ export default function Profile({ meetingId, participantId, onClose }) {
             <div className={styles.countryBadge}>
               <span className={styles.countryFlag}>{getFlagEmoji(profile.country)}</span>
               {getCountryName(profile.country)}
+              {localTime && <span> · 🕒 {localTime}</span>}
             </div>
 
             <div className={styles.detail}>

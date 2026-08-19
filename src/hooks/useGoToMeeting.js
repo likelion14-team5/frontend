@@ -5,6 +5,20 @@ import {
 } from '../constants/meetingSession';
 import { mapFrontendProfileToBackend } from '../constants/profileOptions';
 
+// 백엔드 오류 응답은 { error: { code, message, field_errors }, request_id } 형태(스펙 8.4).
+// 예전엔 이걸 안 읽고 항상 똑같은 "서버와 통신 오류" 문구만 띄워서, MEETING_FULL(정원 초과)이든
+// DISPLAY_NAME_TAKEN(이름 중복)이든 사용자는 실제 이유를 알 수 없었음 -> 백엔드가 주는
+// 진짜 한국어 메시지를 그대로 보여주도록 파싱한다.
+async function extractErrorMessage(response) {
+  try {
+    const body = await response.json();
+    if (body?.error?.message) return body.error.message;
+  } catch {
+    // JSON이 아닌 응답(예: 502 프록시 에러 페이지)이면 아래 기본 메시지로 대체
+  }
+  return `요청이 실패했습니다. (상태 코드: ${response.status})`;
+}
+
 export function useGoToMeeting() {
   return async (url, profile, voiceAnalysisConsent, meetingTab = 'join', newMeetingTitle = '', maxParticipants = 4) => {
     try {
@@ -31,8 +45,7 @@ export function useGoToMeeting() {
         });
 
         if (!createResponse.ok) {
-          const errorText = await createResponse.text();
-          throw new Error(`회의 생성 실패 (상태 코드: ${createResponse.status}) - ${errorText}`);
+          throw new Error(await extractErrorMessage(createResponse));
         }
 
         const createResult = await createResponse.json();
@@ -74,8 +87,7 @@ export function useGoToMeeting() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`회의 입장 실패 (상태 코드: ${response.status}) - ${errorText}`);
+        throw new Error(await extractErrorMessage(response));
       }
 
       const result = await response.json();
@@ -91,7 +103,7 @@ export function useGoToMeeting() {
       window.location.href = targetUrl;
     } catch (error) {
       console.error('[API 통신 에러]', error);
-      alert('회의에 입장하는 중 서버와 통신 오류가 발생했습니다. 다시 시도해 주십시오.');
+      alert(error.message || '회의에 입장하는 중 서버와 통신 오류가 발생했습니다. 다시 시도해 주십시오.');
     }
   };
 }

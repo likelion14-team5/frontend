@@ -55,7 +55,10 @@ export default function MeetingRoom() {
     const raw = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
   }); // mainPage에서 sessionStorage로 넘어온 프로필
-  const [feedbackOn, setFeedbackOn] = useState(true);
+  // voice_analysis_consent가 false면(입장 시 "음성 분석 동의"를 안 했으면)
+  // F-03(발언 직후 피드백)은 처음부터 꺼진 채로 시작하고 켤 수도 없어야 한다(스펙 5.1).
+  const voiceAnalysisConsent = meetingProfile?.voiceAnalysisConsent ?? false;
+  const [feedbackOn, setFeedbackOn] = useState(voiceAnalysisConsent);
   const [expressionOn, setExpressionOn] = useState(true);
   const [selectedParticipantId, setSelectedParticipantId] = useState(null); // "프로필상세" 클릭한 참가자
 
@@ -99,6 +102,8 @@ export default function MeetingRoom() {
                 label="발언 직후 피드백"
                 isOn={feedbackOn}
                 onToggle={() => setFeedbackOn((v) => !v)}
+                disabled={!voiceAnalysisConsent}
+                disabledReason="입장 시 음성 분석에 동의하지 않아 사용할 수 없습니다."
               />
               <ModeToggle
                 label="발언 전 표현 변환"
@@ -128,10 +133,16 @@ export default function MeetingRoom() {
 
         <main style={{ display: 'flex', flex: 1 }}>
           <div className="main">
+            {/* 공유 링크로 바로 들어왔지만 이 브라우저엔 아직 프로필/토큰이 없는 경우
+                (예전엔 그냥 "mainPage에서 들어오세요" 텍스트만 있고 돌아갈 길이 없었음)
+                -> 이 회의 코드를 그대로 실어서 랜딩의 "회의 입장" 모달로 보낸다. */}
             {!meetingProfile && (
-              <p className="sub-title">
-                전달받은 프로필이 없습니다. mainPage에서 "회의 입장"으로 들어와주세요.
-              </p>
+              <div className="sub-title" style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+                <p>공유받은 회의 링크네요. 참가하려면 프로필을 먼저 입력해주세요.</p>
+                <a href={`/?join=${meetingId}`} className="submit-button" style={{ textDecoration: 'none', display: 'inline-block' }}>
+                  이 회의 참가하기
+                </a>
+              </div>
             )}
             {error && <p className="sub-title">연결 오류: {error}</p>}
             {!callObject && !error && <p className="sub-title">연결 중...</p>}
@@ -147,6 +158,7 @@ export default function MeetingRoom() {
             expressionOn={expressionOn}
             participant={{ name: meetingProfile?.profile?.nickname || '참가자' }}
             onCloseFeedback={() => setFeedbackOn(false)}
+            meetingId={meetingId}
           />
         </main>
       </DailyProvider>

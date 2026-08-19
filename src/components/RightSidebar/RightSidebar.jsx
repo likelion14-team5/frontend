@@ -7,12 +7,9 @@ import FeedbackPanel from "./FeedbackPanel";
 /*  Mock data                                                         */
 /* ------------------------------------------------------------------ */
 
+// F-02(발언 전 표현 변환)는 useExpressionTranslate.js에서 실제 AI를 호출한다.
+// 이 입력값은 그냥 텍스트박스 초기값(placeholder성 예시 문장)일 뿐, 결과는 더 이상 mock이 아니다.
 const MOCK_EXPRESSION_INPUT = "금요일 출시는 절대 불가능해요.";
-
-const MOCK_EXPRESSION_RESULT = {
-  text: "Given our testing requirements, could we discuss moving the release to Monday?",
-  note: "단정적 거절 대신 제약과 대안을 전달합니다.",
-};
 
 const MOCK_FEEDBACK = {
   detected: "That schedule is impossible.",
@@ -29,6 +26,7 @@ export default function RightSidebar({
     expressionOn = true,
     participant = { name: "홍길동" },
     onCloseFeedback = () => {},
+    meetingId,
 }) {
   const [width, setWidth] = useState(340);
   const [isResizing, setIsResizing] = useState(false);
@@ -85,7 +83,7 @@ export default function RightSidebar({
             <ExpressionPanel
               participant={participant}
               initialInput={MOCK_EXPRESSION_INPUT}
-              mockResult={MOCK_EXPRESSION_RESULT}
+              meetingId={meetingId}
             />
           )}
           {feedbackOn && (
