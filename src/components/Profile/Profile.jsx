@@ -84,17 +84,16 @@ export default function Profile({ meetingId, participantId, onClose }) {
             <div className={styles.name}>
               {profile.nickname}
               {role === 'HOST' && <span className={styles.hostBadge}>호스트</span>}
+              <span className={styles.detail}>
+                {profile.organization}
+                {profile.role && ` · ${profile.role}`}
+              </span>
             </div>
 
             <div className={styles.countryBadge}>
               <span className={styles.countryFlag}>{getFlagEmoji(profile.country)}</span>
               {getCountryName(profile.country)}
-              {localTime && <span> · 🕒 {localTime}</span>}
-            </div>
-
-            <div className={styles.detail}>
-              {profile.organization}
-              {profile.role && ` · ${profile.role}`}
+              {localTime && <span> · {localTime}</span>}
             </div>
 
             <div className={styles.sectionHeading}>언어 능력</div>

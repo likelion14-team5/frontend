@@ -49,21 +49,42 @@
 }
 
 .micWrap {
-  position: relative;
   flex: 1;
+  position: relative;
+}
+
+.micWrap .controlBtn {
+  padding: 10px 12px;
 }
 
 .micLevelMeter {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 3px;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 10;
   display: flex;
   justify-content: center;
   align-items: flex-end;
   gap: 3px;
-  height: 12px;
+  width: max-content;
+  min-width: 56px;
+  height: 28px;
+  padding: 6px 8px;
+  transform: translateX(-50%) translateY(4px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.96);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  opacity: 0;
   pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+}
+
+.micWrap:hover .micLevelMeter {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
 .micLevelBar {
