@@ -51,12 +51,18 @@ export function useDailyCall(meetingId) {
         const rawProfile = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
         const meetingProfile = rawProfile ? JSON.parse(rawProfile) : null;
         const myProfile = meetingProfile?.profile;
+        const myParticipantId =
+          meetingProfile?.participantId ||
+          meetingProfile?.profile?.participantId ||
+          meetingProfile?.me?.id ||
+          null;
 
         setCallObject(co);
         await co.join({
           url: room_url,
           token: meeting_token,
           userData: {
+            participantId: myParticipantId,
             role: myProfile?.role || "",
             country: myProfile?.country || "",
             englishProficiency: myProfile?.englishProficiency || "",
