@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { DailyProvider } from '@daily-co/daily-react';
+import { DailyAudio, DailyProvider } from '@daily-co/daily-react';
 import './index.css';
 import HeaderBar from "../components/common/HeaderBar/HeaderBar";
 import ModeToggle from "../components/common/ModeToggle/ModeToggle";
@@ -152,6 +152,8 @@ export default function MeetingRoom() {
       <div className="bg-glow-sub" />
 
       <DailyProvider callObject={callObject}>
+        {callObject && <DailyAudio />}
+
         <HeaderBar
           mobileMenu={
             isMobileMenuOpen && (
