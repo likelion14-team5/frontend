@@ -82,7 +82,6 @@ export const mapBackendProfileToFrontend = (data) => {
     country: data.country_code || '',
     organization: data.organization || '',
     role: data.job_title || data.meeting_role || '',
-    // languages가 배열일 수도 있고 문자열일 수도 있는 경우 안전하게 처리
     languages: Array.isArray(data.languages) ? data.languages.join(', ') : (data.languages || ''),
     englishProficiency: data.english_proficiency || '',
     communicationStyle: data.communication_style || '',
@@ -105,7 +104,7 @@ export const mapFrontendProfileToBackend = (formData) => {
       
     english_proficiency: formData.englishProficiency || '미지정',
     communication_style: formData.communicationStyle || '미지정',
-    // 폼에서 입력받지 않고 브라우저 시간대를 그대로 자동 감지해서 보낸다.
+    // 폼에서 입력받지 않고 브라우저 시간대를 그대로 자동 감지해서 보냄
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     additional_considerations: formData.additionalConsiderations?.trim() || '없음',
   };
