@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useDaily } from '@daily-co/daily-react';
 import {
-  MEETING_PROFILE_STORAGE_KEY,
-  PARTICIPANT_TOKEN_KEY,
   API_ENDPOINTS,
+  clearMeetingSession,
+  getParticipantToken,
 } from '../../constants/meetingSession';
 
 // react-router-dom을 안 써서 MeetingRoom.jsx와 동일한 방식으로 URL에서 직접 뽑는다.
@@ -33,7 +33,7 @@ export function useEndMeeting(isHost = false) {
     setEnding(true);
 
     try {
-      const token = sessionStorage.getItem(PARTICIPANT_TOKEN_KEY);
+      const token = getParticipantToken(meetingId);
       const endpoint = isHost
         ? API_ENDPOINTS.END_MEETING(meetingId)
         : API_ENDPOINTS.LEAVE_MEETING(meetingId);
@@ -54,8 +54,7 @@ export function useEndMeeting(isHost = false) {
       // no-op — 어차피 곧 페이지를 벗어난다.
     }
 
-    sessionStorage.removeItem(MEETING_PROFILE_STORAGE_KEY);
-    sessionStorage.removeItem(PARTICIPANT_TOKEN_KEY);
+    clearMeetingSession(meetingId);
     window.location.href = '/';
   };
 

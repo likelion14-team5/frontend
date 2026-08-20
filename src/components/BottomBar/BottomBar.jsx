@@ -17,7 +17,7 @@ export default function BottomBar({ isHost = false }) {
   // 음량(0~1)을 5칸짜리 막대로 환산 - *3은 보통 목소리 크기에서도 칸이 잘 차오르게 하는 민감도 보정.
   const activeSegments = micOn ? Math.round(Math.min(1, micLevel * 3) * 5) : 0;
   const { cameraOn, toggleCamera } = useCamera();
-  const { showEndConfirm, requestEnd, cancelEnd, confirmEnd } = useEndMeeting();
+  const { showEndConfirm, requestEnd, cancelEnd, confirmEnd } = useEndMeeting(isHost);
   const { isOpen: isParticipantsOpen, openPanel, closePanel } = useParticipantsPanel();
 
   return (

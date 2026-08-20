@@ -5,7 +5,7 @@ import FeedbackPanel from "./FeedbackPanel";
 import useSpeechFeedback from "./useSpeechFeedback";
 import useSpeechFeedbackBridge from "./useSpeechFeedbackBridge";
 import { useDaily, useParticipantIds, useMeetingState } from "@daily-co/daily-react";
-import { MEETING_PROFILE_STORAGE_KEY } from "../../constants/meetingSession";
+import { getMeetingProfile } from "../../constants/meetingSession";
 
 /* ------------------------------------------------------------------ */
 /*  RightSidebar — 실제로 export되는 메인 컴포넌트                          */
@@ -65,17 +65,13 @@ export default function RightSidebar({
     };
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
-  // 내 정식 participantId 세션스토리지에서 안전하게 수신
-  let myParticipantId = null;
-  try {
-    const rawProfile = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
-    if (rawProfile) {
-      const parsed = JSON.parse(rawProfile);
-      myParticipantId = parsed?.participantId || parsed?.profile?.participantId || parsed?.me?.id || null;
-    }
-  } catch (e) {
-    console.error("세션 스토리지 파싱 오류:", e);
-  }
+  // 현재 회의에 저장된 내 정식 participantId를 사용한다.
+  const meetingProfile = getMeetingProfile(meetingId);
+  const myParticipantId =
+    meetingProfile?.participantId ||
+    meetingProfile?.profile?.participantId ||
+    meetingProfile?.me?.id ||
+    null;
 
   const participants = participantIds
     .map((id) => {

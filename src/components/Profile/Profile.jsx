@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styles from './Profile.module.css';
 import { useDraggable } from '../ParticipantsPanel/useDraggable';
 import { useLocalTime } from '../VideoGrid/useLocalTime';
-import { API_ENDPOINTS, PARTICIPANT_TOKEN_KEY } from '../../constants/meetingSession';
+import { API_ENDPOINTS, getParticipantToken } from '../../constants/meetingSession';
 import {
   mapBackendProfileToFrontend,
   getCountryName,
@@ -40,7 +40,7 @@ export default function Profile({ meetingId, participantId, onClose }) {
       setLoading(true);
       setError(null);
       try {
-        const token = sessionStorage.getItem(PARTICIPANT_TOKEN_KEY);
+        const token = getParticipantToken(meetingId);
         const response = await fetch(
           API_ENDPOINTS.GET_PARTICIPANT_DETAIL(meetingId, participantId),
           { headers: { 'X-Participant-Token': token } }

@@ -11,11 +11,13 @@ import MeetingInfoModal from '../components/common/HeaderBar/MeetingInfoModal';
 import MeetingModal from '../components/landing/MeetingModal';
 import ProfileForm from '../components/landing/ProfileForm';
 import { useDailyCall } from '../hooks/useDailyCall';
-import { useClickOutside } from '../hooks/useClickOutside';
+import { useClickOutside } from '../hooks/UseClickOutside';
 import { useLeaveOnUnload } from '../hooks/useLeaveOnUnload';
 import {
-  MEETING_PROFILE_STORAGE_KEY,
-  API_ENDPOINTS, PARTICIPANT_TOKEN_KEY
+  API_ENDPOINTS,
+  getMeetingProfile,
+  getParticipantToken,
+  saveMeetingProfile,
 } from '../constants/meetingSession';
 import { mapFrontendProfileToBackend } from '../constants/profileOptions';
 import { useLanguage } from '../hooks/useLanguage.jsx';
@@ -56,8 +58,7 @@ export default function MeetingRoom() {
   };
 
   const [meetingProfile, setMeetingProfile] = useState(() => {
-    const raw = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    return getMeetingProfile(meetingId);
   });
   const [showMyProfileModal, setShowMyProfileModal] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -73,7 +74,7 @@ export default function MeetingRoom() {
 
     const fetchMeetingContext = async () => {
       try {
-        const token = sessionStorage.getItem(PARTICIPANT_TOKEN_KEY);
+        const token = getParticipantToken(meetingId);
         const response = await fetch(API_ENDPOINTS.GET_MEETING_CONTEXT(meetingId), {
           headers: { 'X-Participant-Token': token },
         });
@@ -107,7 +108,7 @@ export default function MeetingRoom() {
   const handleSaveMyProfile = async (newProfile) => {
     setSavingProfile(true);
     try {
-      const token = sessionStorage.getItem(PARTICIPANT_TOKEN_KEY);
+      const token = getParticipantToken(meetingId);
       const response = await fetch(API_ENDPOINTS.UPDATE_MY_PROFILE(meetingId), {
         method: 'PATCH',
         headers: {
@@ -123,7 +124,7 @@ export default function MeetingRoom() {
 
       const updated = { ...meetingProfile, profile: newProfile };
       setMeetingProfile(updated);
-      sessionStorage.setItem(MEETING_PROFILE_STORAGE_KEY, JSON.stringify(updated));
+      saveMeetingProfile(meetingId, updated);
 
       // 다른 참가자 화면의 이름표도 실시간으로 갱신되도록 Daily userData를 다시 보낸다.
       callObject?.setUserData({

@@ -1,29 +1,27 @@
 import { useState } from 'react';
 import { EMPTY_PROFILE } from '../constants/profileOptions';
 
-// 예전엔 React state에만 저장해서 새로고침하면 프로필이 매번 날아갔음(다시 다 입력해야 함).
-// "미리 작성해두고 저장" 요청에 맞게 localStorage에 저장해서 재방문/새로고침에도 남아있게 한다.
-const SAVED_PROFILE_KEY = 'attune_saved_profile';
+const LEGACY_SAVED_PROFILE_KEY = 'attune_saved_profile';
 
-function loadSavedProfile() {
+function createInitialProfile(initialProfile) {
+  // 과거 버전이 브라우저 전체에 저장한 프로필을 삭제한다.
+  // 참가자는 초대 링크로 입장할 때마다 자기 정보를 새로 입력해야 한다.
   try {
-    const raw = localStorage.getItem(SAVED_PROFILE_KEY);
-    return raw ? { ...EMPTY_PROFILE, ...JSON.parse(raw) } : EMPTY_PROFILE;
+    localStorage.removeItem(LEGACY_SAVED_PROFILE_KEY);
   } catch {
-    return EMPTY_PROFILE;
+    // 저장소 접근이 막힌 환경이어도 빈 프로필로 계속 진행한다.
   }
+
+  return { ...EMPTY_PROFILE, ...initialProfile };
 }
 
-export function useProfile(initialProfile = loadSavedProfile()) {
-  const [savedProfile, setSavedProfile] = useState(initialProfile);
+export function useProfile(initialProfile = EMPTY_PROFILE) {
+  const [savedProfile, setSavedProfile] = useState(() =>
+    createInitialProfile(initialProfile),
+  );
 
   const saveProfile = (newProfile) => {
     setSavedProfile(newProfile);
-    try {
-      localStorage.setItem(SAVED_PROFILE_KEY, JSON.stringify(newProfile));
-    } catch {
-      // localStorage를 못 쓰는 환경(프라이빗 모드 등)이면 이번 세션 동안만 기억한다.
-    }
   };
 
   return { savedProfile, saveProfile };

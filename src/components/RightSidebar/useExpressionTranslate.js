@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { API_ENDPOINTS, PARTICIPANT_TOKEN_KEY } from "../../constants/meetingSession";
+import { API_ENDPOINTS, getParticipantToken } from "../../constants/meetingSession";
 
 // F-02 "발언 전 표현 변환" — 백엔드(POST /meetings/{id}/pre-speech)가 OpenAI를 직접 호출하고
 // 프론트는 결과만 받는다. 선택된 대상(targetParticipantId)을 백엔드로 함께 전달한다.
@@ -17,7 +17,7 @@ export function useExpressionTranslate(meetingId) {
       setResult(null);
 
       try {
-        const token = sessionStorage.getItem(PARTICIPANT_TOKEN_KEY);
+        const token = getParticipantToken(meetingId);
         const response = await fetch(API_ENDPOINTS.CREATE_PRE_SPEECH(meetingId), {
           method: "POST",
           headers: {

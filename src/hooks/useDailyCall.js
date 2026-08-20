@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import Daily from "@daily-co/daily-js";
-import { PARTICIPANT_TOKEN_KEY, API_ENDPOINTS, MEETING_PROFILE_STORAGE_KEY } from "../constants/meetingSession";
+import {
+  API_ENDPOINTS,
+  getMeetingProfile,
+  getParticipantToken,
+} from "../constants/meetingSession";
 
 /**
  * Daily Call Object 연결 레이어. MeetingRoom(page) 최상단에서 한 번만 호출하고,
@@ -26,7 +30,7 @@ export function useDailyCall(meetingId) {
 
     async function connect() {
       try {
-        const token = sessionStorage.getItem(PARTICIPANT_TOKEN_KEY);
+        const token = getParticipantToken(meetingId);
         const response = await fetch(API_ENDPOINTS.GET_MEDIA_SESSION(meetingId), {
           method: "POST",
           headers: { "X-Participant-Token": token },
@@ -48,8 +52,7 @@ export function useDailyCall(meetingId) {
 
         // 요약 프로필 정보는 백엔드 API 없이, Daily의 userData로 참가자끼리 자동 공유되게 실어 보낸다.
         // (join 시 userData를 넣으면 다른 참가자의 participant.userData로 그대로 전달됨)
-        const rawProfile = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
-        const meetingProfile = rawProfile ? JSON.parse(rawProfile) : null;
+        const meetingProfile = getMeetingProfile(meetingId);
         const myProfile = meetingProfile?.profile;
         const myParticipantId =
           meetingProfile?.participantId ||

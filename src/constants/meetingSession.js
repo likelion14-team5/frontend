@@ -1,5 +1,60 @@
-export const MEETING_PROFILE_STORAGE_KEY = 'meeting_user_profile';
-export const PARTICIPANT_TOKEN_KEY = 'participant_token';
+const MEETING_PROFILE_STORAGE_KEY = 'meeting_user_profile';
+const PARTICIPANT_TOKEN_KEY = 'participant_token';
+
+function getScopedStorageKey(baseKey, meetingId) {
+  return `${baseKey}:${meetingId}`;
+}
+
+export function getMeetingProfile(meetingId) {
+  if (!meetingId) return null;
+
+  try {
+    const raw = sessionStorage.getItem(
+      getScopedStorageKey(MEETING_PROFILE_STORAGE_KEY, meetingId),
+    );
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function getParticipantToken(meetingId) {
+  if (!meetingId) return null;
+  return sessionStorage.getItem(
+    getScopedStorageKey(PARTICIPANT_TOKEN_KEY, meetingId),
+  );
+}
+
+export function saveMeetingSession(meetingId, participantToken, meetingProfile) {
+  if (!meetingId) return;
+
+  sessionStorage.setItem(
+    getScopedStorageKey(PARTICIPANT_TOKEN_KEY, meetingId),
+    participantToken,
+  );
+  sessionStorage.setItem(
+    getScopedStorageKey(MEETING_PROFILE_STORAGE_KEY, meetingId),
+    JSON.stringify(meetingProfile),
+  );
+}
+
+export function saveMeetingProfile(meetingId, meetingProfile) {
+  if (!meetingId) return;
+  sessionStorage.setItem(
+    getScopedStorageKey(MEETING_PROFILE_STORAGE_KEY, meetingId),
+    JSON.stringify(meetingProfile),
+  );
+}
+
+export function clearMeetingSession(meetingId) {
+  if (!meetingId) return;
+  sessionStorage.removeItem(
+    getScopedStorageKey(MEETING_PROFILE_STORAGE_KEY, meetingId),
+  );
+  sessionStorage.removeItem(
+    getScopedStorageKey(PARTICIPANT_TOKEN_KEY, meetingId),
+  );
+}
 
 // 프론트/백엔드가 다른 도메인으로 배포되면 상대경로('/api/v1')가 깨지므로
 // VITE_API_BASE_URL로 실제 백엔드 주소를 오버라이드할 수 있게 한다.

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { API_ENDPOINTS, PARTICIPANT_TOKEN_KEY } from "../constants/meetingSession";
+import { API_ENDPOINTS, getParticipantToken } from "../constants/meetingSession";
 
 // 탭/창을 그냥 닫아도 백엔드에 퇴장 처리(/leave)가 되도록 pagehide 시점에 호출한다.
 // keepalive: true - 일반 fetch는 언로드 중 취소될 수 있어서 필요함.
@@ -30,7 +30,7 @@ export function useLeaveOnUnload(meetingId) {
     const leave = () => {
       if (isReloadingRef.current) return; // F5/Ctrl+R 새로고침이면 나간 걸로 처리하지 않는다.
 
-      const token = sessionStorage.getItem(PARTICIPANT_TOKEN_KEY);
+      const token = getParticipantToken(meetingId);
       if (!token) return;
       try {
         fetch(API_ENDPOINTS.LEAVE_MEETING(meetingId), {

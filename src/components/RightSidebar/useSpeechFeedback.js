@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import {
   API_ENDPOINTS,
-  PARTICIPANT_TOKEN_KEY,
+  getParticipantToken,
 } from '../../constants/meetingSession';
 
 export default function useSpeechFeedback(meetingId) {
@@ -24,7 +24,7 @@ export default function useSpeechFeedback(meetingId) {
       setError(null);
 
       try {
-        const token = sessionStorage.getItem(PARTICIPANT_TOKEN_KEY);
+        const token = getParticipantToken(meetingId);
 
         const response = await fetch(
           API_ENDPOINTS.ANALYZE_SPEECH_FEEDBACK(meetingId),
