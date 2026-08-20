@@ -3,7 +3,8 @@ import styles from "./RightSidebar.module.css";
 import ExpressionPanel from "./ExpressionPanel";
 import FeedbackPanel from "./FeedbackPanel";
 import useSpeechFeedback from "./useSpeechFeedback";
-import { useDaily, useParticipantIds } from "@daily-co/daily-react";
+import useSpeechFeedbackBridge from "./useSpeechFeedbackBridge";
+import { useDaily, useParticipantIds, useMeetingState } from "@daily-co/daily-react";
 import { MEETING_PROFILE_STORAGE_KEY } from "../../constants/meetingSession";
 
 /* ------------------------------------------------------------------ */
@@ -20,11 +21,10 @@ export default function RightSidebar({
   feedbackTargetParticipantId,
   onChangeFeedbackTarget,
   initialInput = "",
+  voiceAnalysisConsent,
 }) {
   const [width, setWidth] = useState(340);
   const [isResizing, setIsResizing] = useState(false);
-
-  const { feedback } = useSpeechFeedback(meetingId);
 
   const callObject = useDaily();
   const participantIds = useParticipantIds() || [];
@@ -97,15 +97,56 @@ export default function RightSidebar({
           null);
 
       return {
-        id: realParticipantId || p.session_id || id,      
+        id: realParticipantId || p.session_id || id,
         participantId: realParticipantId || null,
         session_id: p.session_id,
-        nickname: p.user_name || userData.nickname || userData.profile?.nickname || "참가자",
+        nickname:
+          p.user_name ||
+          userData.nickname ||
+          userData.profile?.nickname ||
+          "참가자",
         local: p.local,
         userData: userData,
       };
     })
     .filter(Boolean);
+
+  /*
+   * 음성 피드백
+   *
+   * final transcript가 발생하면
+   * useSpeechFeedbackBridge가 analyzeSpeech를 호출.
+   */
+
+  const { feedback, analyzeSpeech } = useSpeechFeedback(meetingId);
+
+  /*
+   * Daily 회의 상태
+   *
+   * Daily의 meetingState()가 "joined-meeting"이면
+   * 현재 회의에 정상적으로 입장한 상태입니다.
+   */
+  const meetingState = useMeetingState(); // "new" | "loading" | "joining-meeting" | "joined" | "left-meeting" | "error"
+  const meetingActive = meetingState === "joined-meeting";
+  const joined = meetingActive;
+
+  /*
+   * 발언 후 음성 피드백 브리지
+   *
+   * 조건:
+   * - Daily 회의 입장 완료
+   * - 음성 분석 동의
+   * - feedbackOn 활성화
+   * - 회의 활성 상태
+   * - Daily 마이크 ON 상태는 bridge 내부에서 확인
+   */
+  useSpeechFeedbackBridge({
+    joined,
+    voiceAnalysisConsent,
+    feedbackOn,
+    meetingActive,
+    analyzeSpeech,
+  });
 
   const showNothing = !feedbackOn && !expressionOn;
 
@@ -133,7 +174,20 @@ export default function RightSidebar({
             />
           )}
           {feedbackOn && (
-            <FeedbackPanel feedback={feedback} onClose={onCloseFeedback} />
+            <FeedbackPanel
+              feedback={
+                feedback
+                  ? {
+                      detected: feedback.detected_text,
+                      warning: feedback.explanation_ko,
+                      alternative: feedback.alternative_expression_en,
+                      riskType: feedback.risk_type,
+                      mayBeInaccurate: feedback.transcript_may_be_inaccurate,
+                    }
+                  : null
+              }
+              onClose={onCloseFeedback}
+            />
           )}
         </>
       )}

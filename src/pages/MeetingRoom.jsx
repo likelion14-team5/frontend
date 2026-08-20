@@ -235,6 +235,10 @@ export default function MeetingRoom() {
             meetingId={meetingId}
             feedbackTargetParticipantId={feedbackTargetParticipantId}
             onChangeFeedbackTarget={setFeedbackTargetParticipantId}
+
+            joined={joined}
+            voiceAnalysisConsent={voiceAnalysisConsent}
+            meetingActive={meetingInfo?.status === 'ACTIVE'}
           />
         </main>
       </DailyProvider>
