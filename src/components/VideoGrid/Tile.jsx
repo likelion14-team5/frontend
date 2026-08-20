@@ -3,6 +3,7 @@ import { useVideoTrack } from "@daily-co/daily-react";
 import ParticipantInfoBar from "../ParticipantInfoBar/ParticipantInfoBar";
 import { getCountryName, getEnglishProficiencyLabel, getCommunicationStyleLabel } from "../../constants/profileOptions";
 import { useLocalTime } from "./useLocalTime";
+import { useLanguage } from "../../hooks/useLanguage.jsx";
 import styles from "./VideoGrid.module.css";
 
 /**
@@ -12,6 +13,7 @@ import styles from "./VideoGrid.module.css";
  * 요약 프로필 정보(국적·직무·영어 실력)는 Daily userData로 참가자 간 공유한다.
  */
 function Tile({ participant, isLocal, onViewProfile }) {
+  const { t } = useLanguage();
   const videoRef = useRef(null);
   const videoTrack = useVideoTrack(participant.session_id);
 
@@ -24,7 +26,7 @@ function Tile({ participant, isLocal, onViewProfile }) {
     }
   }, [videoTrack.state, videoTrack.persistentTrack]);
 
-  const name = participant.user_name || "참가자";
+  const name = participant.user_name || t('meetingRoom.defaultParticipantName');
   const cameraOff = videoTrack.state !== "playable";
   const localTime = useLocalTime(participant.userData?.timezone);
 
@@ -43,8 +45,12 @@ function Tile({ participant, isLocal, onViewProfile }) {
           name,
           country: getCountryName(participant.userData?.country),
           role: participant.userData?.role || "",
-          englishLevel: getEnglishProficiencyLabel(participant.userData?.englishProficiency),
-          communicationStyle: getCommunicationStyleLabel(participant.userData?.communicationStyle),
+          englishLevel: participant.userData?.englishProficiency
+            ? t(`profileOptions.englishProficiency.${participant.userData.englishProficiency}`)
+            : getEnglishProficiencyLabel(participant.userData?.englishProficiency),
+          communicationStyle: participant.userData?.communicationStyle
+            ? t(`profileOptions.communicationStyle.${participant.userData.communicationStyle}`)
+            : getCommunicationStyleLabel(participant.userData?.communicationStyle),
           localTime,
         }}
         isSelf={isLocal}

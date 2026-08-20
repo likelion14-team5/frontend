@@ -3,10 +3,12 @@ import { Mic, MicOff, Video, VideoOff, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import styles from './ParticipantsPanel.module.css';
 import { useDraggable } from './useDraggable';
+import { useLanguage } from '../../hooks/useLanguage.jsx';
 
 // 실제로 회의에 들어와 있는 참가자 한 명. 더미 데이터 없이 Daily 참가자 그대로 사용한다.
 // 이름/마이크/카메라 상태는 Daily 트랙에서, 직무는 useDailyCall.js가 join 시 실어 보낸 userData.role에서 가져온다.
 function ParticipantRow({ sessionId, isHost }) {
+  const { t } = useLanguage();
   const participant = useParticipant(sessionId);
 
   if (!participant) return null;
@@ -25,18 +27,18 @@ function ParticipantRow({ sessionId, isHost }) {
       <div className={styles.info}>
         <div>
           <div className={styles.name}>
-            {participant.user_name || '참가자'}
-            {participant.local && ' (나)'}
+            {participant.user_name || t('meetingRoom.defaultParticipantName')}
+            {participant.local && t('participantsPanel.selfSuffix')}
           </div>
           {role && <div className={styles.role}>{role}</div>}
         </div>
-        {isParticipantHost && <span className={styles.host}>(호스트)</span>}
+        {isParticipantHost && <span className={styles.host}>{t('participantsPanel.hostSuffix')}</span>}
       </div>
       <div className={styles.mediaStatus} aria-label="미디어 상태">
-        <span className={styles.mediaIcon} title={micOn ? '마이크 켜짐' : '마이크 꺼짐'} aria-label={micOn ? '마이크 켜짐' : '마이크 꺼짐'}>
+        <span className={styles.mediaIcon} title={micOn ? t('participantsPanel.micOn') : t('participantsPanel.micOff')} aria-label={micOn ? t('participantsPanel.micOn') : t('participantsPanel.micOff')}>
           {micOn ? <Mic size={21} /> : <MicOff size={21} />}
         </span>
-        <span className={styles.mediaIcon} title={cameraOn ? '카메라 켜짐' : '카메라 꺼짐'} aria-label={cameraOn ? '카메라 켜짐' : '카메라 꺼짐'}>
+        <span className={styles.mediaIcon} title={cameraOn ? t('participantsPanel.cameraOn') : t('participantsPanel.cameraOff')} aria-label={cameraOn ? t('participantsPanel.cameraOn') : t('participantsPanel.cameraOff')}>
           {cameraOn ? <Video size={21} /> : <VideoOff size={21} />}
         </span>
       </div>
@@ -48,6 +50,7 @@ function ParticipantRow({ sessionId, isHost }) {
 // 더미 참가자 없이, 실제로 이 회의에 접속해 있는 Daily 참가자만 보여준다.
 // 브라우저 기본 드래그가 아니라 useDraggable로 직접 구현한 드래그 + 우상단 닫기(X) 버튼.
 export default function ParticipantsPanel({ onClose, isHost }) {
+  const { t } = useLanguage();
   const { position, handleMouseDown } = useDraggable({ x: 0, y: 0 });
   const participantIds = useParticipantIds();
 
@@ -57,7 +60,7 @@ export default function ParticipantsPanel({ onClose, isHost }) {
       style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
     >
       <div className={styles.header} onMouseDown={handleMouseDown}>
-        <span className={styles.title}>참가자 ({participantIds.length})</span>
+        <span className={styles.title}>{t('bottomBar.participants')} ({participantIds.length})</span>
         <button type="button" className={styles.closeBtn} onClick={onClose}>
           <X size={16} aria-hidden="true" />
         </button>

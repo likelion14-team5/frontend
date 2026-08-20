@@ -1,14 +1,11 @@
 import {
   MEETING_PROFILE_STORAGE_KEY,
-  PARTICIPANT_TOKEN_KEY, // 토큰 저장용 키
+  PARTICIPANT_TOKEN_KEY,
   API_ENDPOINTS,
 } from '../constants/meetingSession';
 import { mapFrontendProfileToBackend } from '../constants/profileOptions';
 
-// 백엔드 오류 응답은 { error: { code, message, field_errors }, request_id } 형태(스펙 8.4).
-// 예전엔 이걸 안 읽고 항상 똑같은 "서버와 통신 오류" 문구만 띄워서, MEETING_FULL(정원 초과)이든
-// DISPLAY_NAME_TAKEN(이름 중복)이든 사용자는 실제 이유를 알 수 없었음 -> 백엔드가 주는
-// 진짜 한국어 메시지를 그대로 보여주도록 파싱한다.
+// 백엔드 오류 응답은 { error: { code, message } } 형태라 실제 메시지를 꺼내서 보여준다.
 async function extractErrorMessage(response) {
   try {
     const body = await response.json();
@@ -22,13 +19,11 @@ async function extractErrorMessage(response) {
 export function useGoToMeeting() {
   return async (url, profile, voiceAnalysisConsent, meetingTab = 'join', newMeetingTitle = '', maxParticipants = 4) => {
     try {
-      // 입력받은 url에서 순수 meetingId 추출 및 올바른 회의실 URL 경로 재설정
       let meetingId = url.split('/').pop().split('?')[0];
       const targetUrl = `/meetings/${meetingId}`;
 
       const backendProfile = mapFrontendProfileToBackend(profile);
 
-      // 1. '새 회의 만들기' -> 방+회의+HOST를 한 번에 생성.
       if (meetingTab === 'create') {
         const createResponse = await fetch(API_ENDPOINTS.CREATE_MEETING, {
           method: 'POST',

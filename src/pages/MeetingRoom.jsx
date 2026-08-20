@@ -18,19 +18,16 @@ import {
   API_ENDPOINTS, PARTICIPANT_TOKEN_KEY
 } from '../constants/meetingSession';
 import { mapFrontendProfileToBackend } from '../constants/profileOptions';
+import { useLanguage } from '../hooks/useLanguage.jsx';
 
-// react-router-dom 없이 main.jsx가 pathname만 보고 페이지를 고르는 구조라
-// (main.jsx: isMeetingRoute ? MeetingRoom : App, 둘 다 prop 없이 렌더링됨)
-// meetingId는 여기서 URL 경로를 직접 파싱해서 구한다.
+// react-router 없이 pathname을 직접 파싱해서 meetingId를 구한다.
 function extractMeetingIdFromPath(pathname) {
   const match = pathname.match(/\/meetings\/([^/]+)/);
   return match ? match[1] : null;
 }
 
-// 회의방 화면 - "회의 입장" 이후 이동할 페이지.
-// Daily 연결은 여기(page 최상단)에서 한 번만 만들고, DailyProvider로 HeaderBar 아래
-// 전체(VideoGrid + BottomBar + RightSidebar)를 감싸서 어디서든 daily-react 훅을 쓸 수 있게 한다.
 export default function MeetingRoom() {
+  const { t } = useLanguage();
   const meetingId = extractMeetingIdFromPath(window.location.pathname);
   const { callObject, joined, error } = useDailyCall(meetingId);
   useLeaveOnUnload(meetingId);
@@ -38,6 +35,8 @@ export default function MeetingRoom() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const infoModalRef = useRef(null);
   useClickOutside(infoModalRef, () => setShowInfoModal(false));
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [meetingInfo, setMeetingInfo] = useState(null);
 
@@ -59,18 +58,16 @@ export default function MeetingRoom() {
   const [meetingProfile, setMeetingProfile] = useState(() => {
     const raw = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
-  }); // mainPage에서 sessionStorage로 넘어온 프로필
+  });
   const [showMyProfileModal, setShowMyProfileModal] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
-  // voice_analysis_consent가 false면(입장 시 "음성 분석 동의"를 안 했으면)
-  // F-03(발언 직후 피드백)은 처음부터 꺼진 채로 시작하고 켤 수도 없어야 한다(스펙 5.1).
+  // 음성 분석 동의를 안 했으면 F-03은 켤 수 없어야 한다.
   const voiceAnalysisConsent = meetingProfile?.voiceAnalysisConsent ?? false;
   const [feedbackOn, setFeedbackOn] = useState(voiceAnalysisConsent);
   const [expressionOn, setExpressionOn] = useState(true);
   const [selectedParticipantId, setSelectedParticipantId] = useState(null); // "프로필상세" 클릭한 참가자
   const [feedbackTargetParticipantId, setFeedbackTargetParticipantId] = useState(null);
 
-  // 회의실 입장 시, 회의 컨텍스트(제목, 인원 등)를 백엔드에서 가져온다.
   useEffect(() => {
     if (!meetingId) return;
 
@@ -93,8 +90,7 @@ export default function MeetingRoom() {
     fetchMeetingContext();
   }, [meetingId]);
 
-  // 탭 제목이 항상 "Attune"으로만 떠서 여러 회의 탭을 구분할 수가 없었음 - 회의 제목을 받아오면
-  // 탭 제목도 그걸로 바꾸고, 페이지를 벗어날 때(언마운트) 원래 제목으로 되돌린다.
+  // 회의 제목을 받아오면 탭 제목도 그걸로 바꾸고, 벗어날 때 원래 제목으로 되돌린다.
   useEffect(() => {
     if (!meetingInfo?.title) return undefined;
 
@@ -108,8 +104,6 @@ export default function MeetingRoom() {
 
   const toggleInfoModal = () => setShowInfoModal((prev) => !prev);
 
-  // 헤더의 "나" 아바타를 눌러서 여는, 내 프로필만 수정하는 창.
-  // 참가자 목록(ParticipantsPanel)과는 무관하게 별도로 만든 것 - 거긴 건드리지 않는다.
   const handleSaveMyProfile = async (newProfile) => {
     setSavingProfile(true);
     try {
@@ -124,15 +118,14 @@ export default function MeetingRoom() {
       });
       const body = await response.json();
       if (!response.ok) {
-        throw new Error(body?.error?.message ?? '프로필 수정에 실패했습니다.');
+        throw new Error(body?.error?.message ?? t('meetingRoom.profileUpdateFailed'));
       }
 
       const updated = { ...meetingProfile, profile: newProfile };
       setMeetingProfile(updated);
       sessionStorage.setItem(MEETING_PROFILE_STORAGE_KEY, JSON.stringify(updated));
 
-      // 다른 참가자 화면의 이름표(국가·직무·영어실력·소통방식·시간대)도 실시간으로
-      // 갱신되도록 Daily userData를 다시 보낸다 (useDailyCall.js가 join 시 보내던 것과 동일한 값).
+      // 다른 참가자 화면의 이름표도 실시간으로 갱신되도록 Daily userData를 다시 보낸다.
       callObject?.setUserData({
         role: newProfile.role || '',
         country: newProfile.country || '',
@@ -150,7 +143,7 @@ export default function MeetingRoom() {
     }
   };
 
-  // profile.role은 직무이므로, 회의 권한은 별도 meetingRole 필드로 판별한다.
+  // profile.role은 직무명이라 회의 권한 판별에는 못 씀 - meetingRole을 따로 본다.
   const isHost = meetingProfile?.meetingRole === 'HOST';
 
   return (
@@ -159,67 +152,113 @@ export default function MeetingRoom() {
       <div className="bg-glow-sub" />
 
       <DailyProvider callObject={callObject}>
-        <HeaderBar>
+        <HeaderBar
+          mobileMenu={
+            isMobileMenuOpen && (
+              <div className="mobile-drawer overlay-fade">
+                <div className="mobile-drawer-header">
+                  <span className="logo">Attune</span>
+                </div>
+
+                <div className="mobile-menu-list">
+                  <div className="mobile-menu-item">
+                    <ModeToggle
+                      label={t('meetingRoom.feedbackAfter')}
+                      isOn={feedbackOn}
+                      onToggle={() => setFeedbackOn((v) => !v)}
+                      disabled={!voiceAnalysisConsent}
+                      disabledReason={t('meetingRoom.feedbackAfterDisabledReason')}
+                    />
+                  </div>
+                  <div className="mobile-menu-item">
+                    <ModeToggle
+                      label={t('meetingRoom.expressionBefore')}
+                      isOn={expressionOn}
+                      onToggle={() => setExpressionOn((v) => !v)}
+                    />
+                  </div>
+                  <div className="mobile-menu-item">{t('header.help')}</div>
+                  <div
+                    className="mobile-menu-item"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setShowMyProfileModal(true);
+                    }}
+                  >
+                    {t('meetingRoom.myProfileEdit')}
+                  </div>
+                </div>
+              </div>
+            )
+          }
+        >
           <div className="header-right-group">
-            <div className="header-toggle-group">
-              <ModeToggle
-                label="발언 직후 피드백"
-                isOn={feedbackOn}
-                onToggle={() => setFeedbackOn((v) => !v)}
-                disabled={!voiceAnalysisConsent}
-                disabledReason="입장 시 음성 분석에 동의하지 않아 사용할 수 없습니다."
+          <div className="header-toggle-group desktop-only">
+            <ModeToggle
+              label={t('meetingRoom.feedbackAfter')}
+              isOn={feedbackOn}
+              onToggle={() => setFeedbackOn((v) => !v)}
+              disabled={!voiceAnalysisConsent}
+              disabledReason={t('meetingRoom.feedbackAfterDisabledReason')}
+            />
+            <ModeToggle
+              label={t('meetingRoom.expressionBefore')}
+              isOn={expressionOn}
+              onToggle={() => setExpressionOn((v) => !v)}
+            />
+          </div>
+
+          {/* 화면 폭에 상관없이 항상 보이는 회의 정보 - 햄버거 메뉴 안에 숨기지 않는다. */}
+          <div className="meeting-info-trigger-wrap" ref={infoModalRef}>
+            <span className="header-link" onClick={toggleInfoModal} role="button" tabIndex={0}>
+              {t('meetingRoom.meetingInfo')}
+            </span>
+            {showInfoModal && (
+              <MeetingInfoModal
+                meetingInfo={meetingInfo}
+                onCopyLink={copyInviteLink}
               />
-              <ModeToggle
-                label="발언 전 표현 변환"
-                isOn={expressionOn}
-                onToggle={() => setExpressionOn((v) => !v)}
-              />
+            )}
+          </div>
+
+          <nav className="header-right desktop-only">
+            <span className="header-link">{t('header.help')}</span>
+            <div
+              className="avatar"
+              onClick={() => setShowMyProfileModal(true)}
+              role="button"
+              tabIndex={0}
+              title={t('meetingRoom.myProfileEdit')}
+              style={{ cursor: 'pointer' }}
+            >
+              나
             </div>
+          </nav>
 
-            <nav className="header-right">
-              <div ref={infoModalRef} style={{ position: 'relative' }}>
-                <span className="header-link" onClick={toggleInfoModal} role="button" tabIndex={0}>
-                  회의 정보
-                </span>
-                {showInfoModal && (
-                  <MeetingInfoModal
-                    meetingInfo={meetingInfo}
-                    onCopyLink={copyInviteLink}
-                  />
-                )}
-              </div>
-
-              <span className="header-link">도움말</span>
-              <div
-                className="avatar"
-                onClick={() => setShowMyProfileModal(true)}
-                role="button"
-                tabIndex={0}
-                title="내 프로필 수정"
-                style={{ cursor: 'pointer' }}
-              >
-                나
-              </div>
-            </nav>
+          <button
+            className="mobile-hamburger-btn mobile-only"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-label="메뉴 열기"
+          >
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
           </div>
         </HeaderBar>
 
-        <main style={{ display: 'flex', flex: 1 }}>
+        <main className="meeting-main-row">
           <div className="main">
-            {/* 공유 링크로 바로 들어왔지만 이 브라우저엔 아직 프로필/토큰이 없는 경우
-                (예전엔 그냥 "mainPage에서 들어오세요" 텍스트만 있고 돌아갈 길이 없었음)
-                -> 이 회의 코드를 그대로 실어서 랜딩의 "회의 입장" 모달로 보낸다. */}
+            {/* 공유 링크로 바로 들어와 프로필/토큰이 없으면 회의 코드를 실어서 랜딩으로 보낸다. */}
             {!meetingProfile && (
               <div className="sub-title" style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-                <p>참가하려면 프로필을 먼저 입력해주세요.</p>
+                <p>{t('meetingRoom.joinProfileFirst')}</p>
                 <a href={`/?join=${meetingId}`} className="submit-button" style={{ textDecoration: 'none', display: 'inline-block' }}>
-                  이 회의 참가하기
+                  {t('meetingRoom.joinThisMeeting')}
                 </a>
               </div>
             )}
-            {error && <p className="sub-title">연결 오류: {error}</p>}
-            {!callObject && !error && <p className="sub-title">연결 중...</p>}
-            {callObject && !joined && !error && <p className="sub-title">입장하는 중...</p>}
+            {error && <p className="sub-title">{t('meetingRoom.connectionError')}{error}</p>}
+            {!callObject && !error && <p className="sub-title">{t('meetingRoom.connecting')}</p>}
+            {callObject && !joined && !error && <p className="sub-title">{t('meetingRoom.joining')}</p>}
 
             <VideoGrid onViewProfile={setSelectedParticipantId} />
 
@@ -230,7 +269,7 @@ export default function MeetingRoom() {
             initialInput=""
             feedbackOn={feedbackOn}
             expressionOn={expressionOn}
-            participant={{ name: meetingProfile?.profile?.nickname || '참가자' }}
+            participant={{ name: meetingProfile?.profile?.nickname || t('meetingRoom.defaultParticipantName') }}
             onCloseFeedback={() => setFeedbackOn(false)}
             meetingId={meetingId}
             feedbackTargetParticipantId={feedbackTargetParticipantId}

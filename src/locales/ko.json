@@ -1,0 +1,175 @@
+{
+  "header": {
+    "myInfo": "내 정보",
+    "help": "도움말",
+    "menuOpen": "메뉴 열기",
+    "searchPlaceholder": "검색 내용을 입력하세요...",
+    "joinMeeting": "회의 입장하기",
+    "createMeeting": "+ 새 회의 만들기"
+  },
+  "hero": {
+    "badge": "전 세계 글로벌 팀을 위한 실시간 서포트 AI",
+    "titleLine1": "언어와 문화의 경계를 허무는",
+    "titleHighlight": "글로벌 AI 회의",
+    "titleSuffix": "의 새로운 기준",
+    "subtitleLine1": "실시간 음성 정제, 문화적 커뮤니케이션 매너 가이드, 사전 프로필 싱크로",
+    "subtitleLine2": "전 세계 팀원들과 마치 한 공간에 있는 것처럼 자연스럽고 오해 없이 소통하세요.",
+    "joinMeeting": "회의 입장하기",
+    "createMeeting": "새 회의 만들기"
+  },
+  "previewMockup": {
+    "windowTitle": "AI Work PreView",
+    "liveBadge": "· LIVE REFINING ACTIVE",
+    "col1Label": "🎙️ 실시간 발언 보정 (Real-time Speech Sync)",
+    "detectedTag": "방금 감지한 발언",
+    "speakerName": "KR glidong hong (FrontEnd)",
+    "detectedQuote": "\"That schedule is impossible.\"",
+    "feedbackTag": "🤖 실시간 피드백",
+    "feedbackText": "상대의 계획을 단정적으로 거절하는 표현으로 받아들여질 수 있습니다.",
+    "alternativeLabel": "대안:",
+    "alternativeText": "Could we discuss an alternative schedule?",
+    "col2Label": "✍️ 최적의 발언 추천 (Pre-Speech Assist)",
+    "translateTag": "🤖 발언 전 영어 변환",
+    "inputLabel": "내가 할 말 (한국어)",
+    "inputText": "\"이 부분은 마감 전에 한 번 더 확인해주시면 좋을 것 같아요.\"",
+    "resultLabel": "추천 영어 표현",
+    "resultText": "\"It would be great if you could take one more look at this before the deadline.\"",
+    "reasonLabel": "추천 이유:",
+    "reasonText": "요청을 부드러운 제안 형태로 바꿔 상대가 부담 없이 받아들이도록 조정했습니다."
+  },
+  "joinCreateForm": {
+    "tabJoin": "회의 입장하기",
+    "tabCreate": "새 회의 만들기",
+    "joinSubtitle": "저장된 프로필로 바로 입장합니다.",
+    "meetingCodeLabel": "회의 코드 또는 링크",
+    "meetingCodePlaceholder": "공유받은 회의 링크를 입력해주세요",
+    "createSubtitle": "새로운 회의를 개설하고 전용 코드를 생성합니다.",
+    "meetingTitleLabel": "회의 주제 / 제목",
+    "meetingTitlePlaceholder": "예: 글로벌 마케팅 주간 회의 (필수)",
+    "maxParticipantsLabel": "최대 참가 인원",
+    "participantUnit": "명",
+    "inviteLinkLabel": "초대 링크",
+    "inviteLinkNotice": "회의를 생성하면 회의 화면에서 초대 링크를 복사할 수 있어요.",
+    "profileSummaryLabel": "사용할 프로필",
+    "profileNotSet": "프로필을 입력해주세요",
+    "countryNotSet": "국가 미지정",
+    "communicationStyleNotSet": "소통 방식 미지정",
+    "editProfileButton": "프로필 수정",
+    "consentProfileSharing": "프로필 공개에 동의합니다. (필수)",
+    "consentVoiceAnalysis": "내 음성 분석(발언 피드백)에 동의합니다. (선택)",
+    "consentVoiceAnalysisDescription": "비동의 시 일부 기능 이용이 제한될 수 있습니다.",
+    "submitJoin": "회의 입장",
+    "submitCreate": "회의 생성 및 입장"
+  },
+  "profileForm": {
+    "titleEdit": "프로필 수정",
+    "requiredError": "입력해주세요",
+    "nicknameLabel": "이름 또는 닉네임",
+    "nicknamePlaceholder": "이름 또는 닉네임 입력",
+    "countryLabel": "국가",
+    "countryPlaceholder": "국가 검색 (예: 대한민국, 미국)",
+    "countryNoResult": "목록에 있는 국가만 선택할 수 있어요",
+    "organizationLabel": "소속 조직",
+    "organizationPlaceholder": "소속 조직 입력",
+    "roleLabel": "직무 · 역할",
+    "rolePlaceholder": "직무 및 역할 입력",
+    "languagesLabel": "사용 가능 언어 (쉼표로 구분)",
+    "languagesPlaceholder": "예: 한국어, 영어",
+    "englishProficiencyLabel": "영어 숙련도",
+    "selectPlaceholder": "선택해주세요",
+    "communicationStyleLabel": "선호 소통 방식",
+    "additionalLabel": "상세 정보 / 특이사항 (선택)",
+    "additionalPlaceholder": "예: 천천히 말씀해 주시면 이해하기 쉽습니다, 특정 용어 설명 필요 등",
+    "saving": "저장 중...",
+    "submit": "저장하고 돌아가기"
+  },
+  "profileOptions": {
+    "englishProficiency": {
+      "BEGINNER": "초급",
+      "INTERMEDIATE": "중급",
+      "ADVANCED": "고급"
+    },
+    "communicationStyle": {
+      "DIRECT": "직설적",
+      "INDIRECT": "완곡한",
+      "FACT_FOCUSED": "사실 중심",
+      "EMOTION_EXPRESSIVE": "감정 표현적",
+      "BALANCED": "균형적"
+    }
+  },
+  "meetingRoom": {
+    "feedbackAfter": "발언 직후 피드백",
+    "feedbackAfterDisabledReason": "입장 시 음성 분석에 동의하지 않아 사용할 수 없습니다.",
+    "expressionBefore": "발언 전 표현 변환",
+    "meetingInfo": "회의 정보",
+    "myProfileEdit": "내 프로필 수정",
+    "joinProfileFirst": "참가하려면 프로필을 먼저 입력해주세요.",
+    "joinThisMeeting": "이 회의 참가하기",
+    "connectionError": "연결 오류: ",
+    "connecting": "연결 중...",
+    "joining": "입장하는 중...",
+    "defaultParticipantName": "참가자",
+    "profileUpdateFailed": "프로필 수정에 실패했습니다."
+  },
+  "bottomBar": {
+    "mic": "마이크",
+    "camera": "카메라",
+    "participants": "참가자",
+    "end": "종료",
+    "confirmLeave": "회의를 나가시겠습니까?",
+    "cancel": "취소",
+    "leave": "나가기"
+  },
+  "expressionPanel": {
+    "title": "발언 전 표현 변환",
+    "targetLabel": "대상",
+    "targetPlaceholder": "대상을 선택하세요",
+    "inputPlaceholder": "하고 싶은 말을 입력하세요",
+    "generating": "생성 중...",
+    "generateButton": "영어 표현 만들기",
+    "resultLabel": "추천 표현",
+    "syncingAlert": "참가자 프로필 동기화 중입니다. 잠시 후 다시 시도해 주세요."
+  },
+  "feedbackPanel": {
+    "title": "발언 직후 피드백",
+    "detectedLabel": "방금 감지한 발언",
+    "noDetectionYet": "아직 감지된 발언이 없습니다.",
+    "warningTitle": "이렇게 들릴 수 있어요",
+    "waitingText": "감지하면 피드백을 작성합니다.",
+    "alternativeLabel": "대안",
+    "closeButton": "피드백 닫기"
+  },
+  "meetingInfoModal": {
+    "title": "회의 정보",
+    "nameLabel": "회의 이름",
+    "loading": "불러오는 중...",
+    "startTimeLabel": "시작 시간",
+    "participantsLabel": "참여 인원",
+    "copyButton": "초대 링크 복사",
+    "copiedButton": "복사됨"
+  },
+  "participantProfile": {
+    "title": "참가자 상세 프로필",
+    "loadFailedError": "프로필을 불러오지 못했습니다.",
+    "loading": "불러오는 중...",
+    "hostBadge": "호스트",
+    "languageSectionTitle": "언어 능력",
+    "mainLanguageLabel": "주 사용 언어:",
+    "englishLevelLabel": "영어 실력:",
+    "communicationLabel": "대화 방식:",
+    "noteLabel": "참고사항:",
+    "noteEmpty": "없음"
+  },
+  "participantInfoBar": {
+    "detailButton": "프로필 상세",
+    "selfSuffix": " (나)"
+  },
+  "participantsPanel": {
+    "micOn": "마이크 켜짐",
+    "micOff": "마이크 꺼짐",
+    "cameraOn": "카메라 켜짐",
+    "cameraOff": "카메라 꺼짐",
+    "hostSuffix": "(호스트)",
+    "selfSuffix": " (나)"
+  }
+}

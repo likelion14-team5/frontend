@@ -1,16 +1,11 @@
-// 1. 세션 스토리지 키 상수들
 export const MEETING_PROFILE_STORAGE_KEY = 'meeting_user_profile';
 export const PARTICIPANT_TOKEN_KEY = 'participant_token';
 
-// 2. 백엔드 API 엔드포인트 상수들
-// 로컬 개발은 vite.config.js의 /api proxy로 상대경로('/api/v1')만으로도 동작하지만,
-// 프론트/백엔드가 다른 도메인으로 배포되면 이 상대경로가 깨짐 -> 배포 시 VITE_API_BASE_URL로
-// 실제 백엔드 주소(예: https://api.samepage.com/api/v1)를 넣어 오버라이드할 수 있게 함.
-// 값을 안 주면(로컬 개발 등) 기존과 동일하게 '/api/v1'을 그대로 씀.
+// 프론트/백엔드가 다른 도메인으로 배포되면 상대경로('/api/v1')가 깨지므로
+// VITE_API_BASE_URL로 실제 백엔드 주소를 오버라이드할 수 있게 한다.
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export const API_ENDPOINTS = {
-  // [1~10] 회의 및 참가자 기본 엔드포인트
   CREATE_MEETING: `${API_BASE_URL}/meetings`,
   GET_PUBLIC_MEETING: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/public`,
   JOIN_MEETING: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/participants`,
@@ -23,18 +18,15 @@ export const API_ENDPOINTS = {
   LEAVE_MEETING: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/leave`,
   END_MEETING: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/end`,
 
-  // [11] F-03 음성 분석 ON/OFF 토글
   TOGGLE_VOICE_ANALYSIS: (meetingId) =>
     `${API_BASE_URL}/meetings/${meetingId}/participants/me/voice-analysis`,
 
-  // [12~14] F-02 (발언 전 표현 변환)
   CREATE_PRE_SPEECH: (meetingId) => `${API_BASE_URL}/meetings/${meetingId}/pre-speech`,
   GET_PRE_SPEECH: (meetingId, requestId) =>
     `${API_BASE_URL}/meetings/${meetingId}/pre-speech/${requestId}`,
   REGENERATE_PRE_SPEECH: (meetingId, requestId) =>
     `${API_BASE_URL}/meetings/${meetingId}/pre-speech/${requestId}/regenerate`,
 
-  // [15~17] F-03 (발언 직후 피드백)
   ANALYZE_SPEECH_FEEDBACK: (meetingId) =>
     `${API_BASE_URL}/meetings/${meetingId}/speech-feedback/analyze`,
   GET_SPEECH_FEEDBACK_LIST: (meetingId) =>

@@ -6,8 +6,10 @@ import {
   COMMUNICATION_STYLE_OPTIONS,
   getCountryName,
 } from '../../constants/profileOptions';
+import { useLanguage } from '../../hooks/useLanguage.jsx';
 
 export default function ProfileForm({ initialProfile, onSave, saving = false }) {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState(initialProfile);
   const [countryQuery, setCountryQuery] = useState(getCountryName(initialProfile.country));
   const [errors, setErrors] = useState({});
@@ -85,7 +87,7 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
 
   return (
     <div>
-      <h2 className="card-title">프로필 작성</h2>
+      <h2 className="card-title">{t('profileForm.titleEdit')}</h2>
 
       <form
         onSubmit={handleSubmit}
@@ -96,8 +98,8 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
       >
         <div className="field-group">
           <div className="label-wrapper">
-            <label className="label">이름 또는 닉네임</label>
-            {errors.nickname && <span className="error-text">입력해주세요</span>}
+            <label className="label">{t('profileForm.nicknameLabel')}</label>
+            {errors.nickname && <span className="error-text">{t('profileForm.requiredError')}</span>}
           </div>
           <input
             type="text"
@@ -105,15 +107,15 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
             value={formData.nickname}
             onChange={handleChange}
             className={`input ${errors.nickname ? 'input-error' : ''}`}
-            placeholder="이름 또는 닉네임 입력"
+            placeholder={t('profileForm.nicknamePlaceholder')}
           />
         </div>
 
         {/* 국가 선택 (z-index 30 적용) */}
         <div className="field-group relative z-30" ref={countryRef}>
           <div className="label-wrapper">
-            <label className="label">국가</label>
-            {errors.country && <span className="error-text">입력해주세요</span>}
+            <label className="label">{t('profileForm.countryLabel')}</label>
+            {errors.country && <span className="error-text">{t('profileForm.requiredError')}</span>}
           </div>
           <div className="dropdown-wrapper relative">
             <input
@@ -123,7 +125,7 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
               onChange={handleCountryQueryChange}
               onFocus={() => setIsCountryOpen(true)}
               className={`input ${errors.country ? 'input-error' : ''}`}
-              placeholder="국가 검색 (예: 대한민국, 미국)"
+              placeholder={t('profileForm.countryPlaceholder')}
               autoComplete="off"
             />
             <span className="dropdown-arrow">▼</span>
@@ -142,7 +144,7 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
                   ))
                 ) : (
                   <div className="country-no-result p-3 text-xs text-gray-500 text-center">
-                    목록에 있는 국가만 선택할 수 있어요
+                    {t('profileForm.countryNoResult')}
                   </div>
                 )}
               </div>
@@ -152,8 +154,8 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
 
         <div className="field-group">
           <div className="label-wrapper">
-            <label className="label">소속 조직</label>
-            {errors.organization && <span className="error-text">입력해주세요</span>}
+            <label className="label">{t('profileForm.organizationLabel')}</label>
+            {errors.organization && <span className="error-text">{t('profileForm.requiredError')}</span>}
           </div>
           <input
             type="text"
@@ -161,14 +163,14 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
             value={formData.organization}
             onChange={handleChange}
             className={`input ${errors.organization ? 'input-error' : ''}`}
-            placeholder="소속 조직 입력"
+            placeholder={t('profileForm.organizationPlaceholder')}
           />
         </div>
 
         <div className="field-group">
           <div className="label-wrapper">
-            <label className="label">직무 · 역할</label>
-            {errors.role && <span className="error-text">입력해주세요</span>}
+            <label className="label">{t('profileForm.roleLabel')}</label>
+            {errors.role && <span className="error-text">{t('profileForm.requiredError')}</span>}
           </div>
           <input
             type="text"
@@ -176,14 +178,14 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
             value={formData.role}
             onChange={handleChange}
             className={`input ${errors.role ? 'input-error' : ''}`}
-            placeholder="직무 및 역할 입력"
+            placeholder={t('profileForm.rolePlaceholder')}
           />
         </div>
 
         <div className="field-group">
           <div className="label-wrapper">
-            <label className="label">사용 가능 언어 (쉼표로 구분)</label>
-            {errors.languages && <span className="error-text">입력해주세요</span>}
+            <label className="label">{t('profileForm.languagesLabel')}</label>
+            {errors.languages && <span className="error-text">{t('profileForm.requiredError')}</span>}
           </div>
           <input
             type="text"
@@ -191,15 +193,15 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
             value={formData.languages}
             onChange={handleChange}
             className={`input ${errors.languages ? 'input-error' : ''}`}
-            placeholder="예: 한국어, 영어"
+            placeholder={t('profileForm.languagesPlaceholder')}
           />
         </div>
 
         {/* 영어 숙련도 (z-index 20 적용) */}
         <div className="field-group relative z-20" ref={englishProficiencyRef}>
           <div className="label-wrapper">
-            <label className="label">영어 숙련도</label>
-            {errors.englishProficiency && <span className="error-text">입력해주세요</span>}
+            <label className="label">{t('profileForm.englishProficiencyLabel')}</label>
+            {errors.englishProficiency && <span className="error-text">{t('profileForm.requiredError')}</span>}
           </div>
           <div className="dropdown-wrapper relative">
             <div
@@ -207,11 +209,9 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
               onClick={() => setIsEnglishProficiencyOpen((prev) => !prev)}
             >
               {formData.englishProficiency ? (
-                ENGLISH_PROFICIENCY_OPTIONS.find(
-                  (opt) => opt.value === formData.englishProficiency
-                )?.label
+                t(`profileOptions.englishProficiency.${formData.englishProficiency}`)
               ) : (
-                <span className="select-placeholder text-gray-400">선택해주세요</span>
+                <span className="select-placeholder text-gray-400">{t('profileForm.selectPlaceholder')}</span>
               )}
             </div>
             <span className="dropdown-arrow">▼</span>
@@ -230,7 +230,7 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
                       setIsEnglishProficiencyOpen(false);
                     }}
                   >
-                    {opt.label}
+                    {t(`profileOptions.englishProficiency.${opt.value}`)}
                   </div>
                 ))}
               </div>
@@ -241,8 +241,8 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
         {/* 선호 소통 방식 (z-index 10 적용 및 팝업 최상단 노출) */}
         <div className="field-group relative z-10" ref={communicationStyleRef}>
           <div className="label-wrapper">
-            <label className="label">선호 소통 방식</label>
-            {errors.communicationStyle && <span className="error-text">입력해주세요</span>}
+            <label className="label">{t('profileForm.communicationStyleLabel')}</label>
+            {errors.communicationStyle && <span className="error-text">{t('profileForm.requiredError')}</span>}
           </div>
           <div className="dropdown-wrapper relative">
             <div
@@ -250,11 +250,9 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
               onClick={() => setIsCommunicationStyleOpen((prev) => !prev)}
             >
               {formData.communicationStyle ? (
-                COMMUNICATION_STYLE_OPTIONS.find(
-                  (opt) => opt.value === formData.communicationStyle
-                )?.label
+                t(`profileOptions.communicationStyle.${formData.communicationStyle}`)
               ) : (
-                <span className="select-placeholder text-gray-400">선택해주세요</span>
+                <span className="select-placeholder text-gray-400">{t('profileForm.selectPlaceholder')}</span>
               )}
             </div>
             <span className="dropdown-arrow">▼</span>
@@ -273,7 +271,7 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
                       setIsCommunicationStyleOpen(false);
                     }}
                   >
-                    {opt.label}
+                    {t(`profileOptions.communicationStyle.${opt.value}`)}
                   </div>
                 ))}
               </div>
@@ -284,20 +282,20 @@ export default function ProfileForm({ initialProfile, onSave, saving = false }) 
         {/*  상세 정보 / 특이사항 (선택 입력) */}
         <div className="field-group">
           <div className="label-wrapper">
-            <label className="label">상세 정보 / 특이사항 (선택)</label>
+            <label className="label">{t('profileForm.additionalLabel')}</label>
           </div>
           <textarea
             name="additionalConsiderations"
             value={formData.additionalConsiderations || ''}
             onChange={handleChange}
-            placeholder="예: 천천히 말씀해 주시면 이해하기 쉽습니다, 특정 용어 설명 필요 등"
+            placeholder={t('profileForm.additionalPlaceholder')}
             rows={3}
             className="input resize-none h-auto p-2.5 text-sm"
           />
         </div>
 
         <button type="submit" className="submit-button mt-4" disabled={saving}>
-          {saving ? '저장 중...' : '저장하고 돌아가기'}
+          {saving ? t('profileForm.saving') : t('profileForm.submit')}
         </button>
       </form>
     </div>
