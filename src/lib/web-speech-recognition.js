@@ -157,7 +157,7 @@
       emitState("stopping");
       try {
         recognition.stop();
-      } catch (_) {
+      } catch (_) { // eslint-disable-line no-unused-vars
         emitState("idle");
       }
     }
@@ -169,7 +169,7 @@
       if (recognition) {
         try {
           recognition.abort();
-        } catch (_) {
+        } catch (_) { // eslint-disable-line no-unused-vars
           // 이미 종료된 인식기는 추가 처리가 필요 없다.
         }
       }
