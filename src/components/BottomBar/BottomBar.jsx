@@ -1,6 +1,7 @@
 import { Mic, MicOff, PhoneOff, Users, Video, VideoOff } from 'lucide-react';
 import styles from './BottomBar.module.css';
 import { useMic } from './useMic';
+import { useMicLevel } from './useMicLevel';
 import { useCamera } from './useCamera';
 import { useEndMeeting } from './useEndMeeting';
 import { useParticipantsPanel } from './useParticipantsPanel';
@@ -10,6 +11,9 @@ import ParticipantsPanel from '../ParticipantsPanel/ParticipantsPanel';
 // 마이크/카메라/종료/참가자 동작은 각각 전용 훅에서 담당하고, 이 파일은 그걸 조립해서 화면만 그린다.
 export default function BottomBar({ isHost = false }) {
   const { micOn, toggleMic } = useMic();
+  const micLevel = useMicLevel();
+  // 음량(0~1)을 5칸짜리 막대로 환산 - *3은 보통 목소리 크기에서도 칸이 잘 차오르게 하는 민감도 보정.
+  const activeSegments = micOn ? Math.round(Math.min(1, micLevel * 3) * 5) : 0;
   const { cameraOn, toggleCamera } = useCamera();
   const { showEndConfirm, requestEnd, cancelEnd, confirmEnd } = useEndMeeting();
   const { isOpen: isParticipantsOpen, openPanel, closePanel } = useParticipantsPanel();
@@ -17,16 +21,27 @@ export default function BottomBar({ isHost = false }) {
   return (
     <>
       <div className={styles.controlBar}>
-        <button
-          type="button"
-          className={`${styles.controlBtn} ${micOn ? '' : styles.off}`}
-          onClick={toggleMic}
-        >
-          <span className={styles.buttonContent}>
-            {micOn ? <Mic size={18} aria-hidden="true" /> : <MicOff size={18} aria-hidden="true" />}
-            마이크
-          </span>
-        </button>
+        <div className={styles.micWrap}>
+          <button
+            type="button"
+            className={`${styles.controlBtn} ${micOn ? '' : styles.off}`}
+            onClick={toggleMic}
+          >
+            <span className={styles.buttonContent}>
+              {micOn ? <Mic size={18} aria-hidden="true" /> : <MicOff size={18} aria-hidden="true" />}
+              마이크
+            </span>
+          </button>
+          {/* 마이크 테스트용 음량 미터 - 말했을 때 칸이 실제로 차오르는지 눈으로 확인할 수 있다. */}
+          <div className={styles.micLevelMeter}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span
+                key={i}
+                className={`${styles.micLevelBar} ${i < activeSegments ? styles.micLevelBarActive : ''}`}
+              />
+            ))}
+          </div>
+        </div>
         <button
           type="button"
           className={`${styles.controlBtn} ${cameraOn ? '' : styles.off}`}

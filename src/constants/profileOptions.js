@@ -1,25 +1,50 @@
 // 1. 국가 리스트 (API country_code: 2자리 ISO 대문자)
-export const COUNTRY_LIST = [
-  { code: 'KR', name: '대한민국' },
-  { code: 'US', name: '미국' },
-  { code: 'JP', name: '일본' },
-  { code: 'CN', name: '중국' },
-  { code: 'GB', name: '영국' },
-  { code: 'DE', name: '독일' },
-  { code: 'FR', name: '프랑스' },
-  { code: 'CA', name: '캐나다' },
-  { code: 'AU', name: '호주' },
-  { code: 'VN', name: '베트남' },
-  { code: 'SG', name: '싱가포르' },
-  { code: 'ID', name: '인도네시아' },
-  { code: 'TH', name: '태국' },
-  { code: 'PH', name: '필리핀' },
-  { code: 'IN', name: '인도' },
-  { code: 'ES', name: '스페인' },
-  { code: 'IT', name: '이탈리아' },
-  { code: 'NL', name: '네덜란드' },
-  { code: 'CH', name: '스위스' },
+// 예전엔 19개국만 하드코딩되어 있어서 "글로벌 회의" 앱치고 선택 폭이 너무 좁았음.
+// 국가명을 일일이 손으로 적으면 오탈자/누락 위험이 커서, ISO 3166-1 alpha-2 코드
+// 목록(UN 회원국 + 대만/홍콩/마카오/팔레스타인/바티칸 등 주요 지역)만 관리하고
+// 한글 이름은 브라우저 표준 API(Intl.DisplayNames)로 그때그때 정확하게 만들어 쓴다.
+// 백엔드는 country_code를 "대문자 2글자"인지만 검증하므로(화이트리스트 없음) 안전하게 확장 가능.
+const COUNTRY_CODES = [
+  'AD', 'AE', 'AF', 'AG', 'AL', 'AM', 'AO', 'AR', 'AT', 'AU', 'AZ',
+  'BA', 'BB', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BN', 'BO', 'BR', 'BS', 'BT', 'BW', 'BY', 'BZ',
+  'CA', 'CD', 'CF', 'CG', 'CH', 'CI', 'CL', 'CM', 'CN', 'CO', 'CR', 'CU', 'CV', 'CY', 'CZ',
+  'DE', 'DJ', 'DK', 'DM', 'DO', 'DZ',
+  'EC', 'EE', 'EG', 'ER', 'ES', 'ET',
+  'FI', 'FJ', 'FM', 'FR',
+  'GA', 'GB', 'GD', 'GE', 'GH', 'GM', 'GN', 'GQ', 'GR', 'GT', 'GW', 'GY',
+  'HK', 'HN', 'HR', 'HT', 'HU',
+  'ID', 'IE', 'IL', 'IN', 'IQ', 'IR', 'IS', 'IT',
+  'JM', 'JO', 'JP',
+  'KE', 'KG', 'KH', 'KI', 'KM', 'KN', 'KP', 'KR', 'KW', 'KZ',
+  'LA', 'LB', 'LC', 'LI', 'LK', 'LR', 'LS', 'LT', 'LU', 'LV', 'LY',
+  'MA', 'MC', 'MD', 'ME', 'MG', 'MH', 'MK', 'ML', 'MM', 'MN', 'MO', 'MR', 'MT', 'MU', 'MV', 'MW', 'MX', 'MY', 'MZ',
+  'NA', 'NE', 'NG', 'NI', 'NL', 'NO', 'NP', 'NR', 'NZ',
+  'OM',
+  'PA', 'PE', 'PG', 'PH', 'PK', 'PL', 'PS', 'PT', 'PW', 'PY',
+  'QA',
+  'RO', 'RS', 'RU', 'RW',
+  'SA', 'SB', 'SC', 'SD', 'SE', 'SG', 'SI', 'SK', 'SL', 'SM', 'SN', 'SO', 'SR', 'SS', 'ST', 'SV', 'SY', 'SZ',
+  'TD', 'TG', 'TH', 'TJ', 'TL', 'TM', 'TN', 'TO', 'TR', 'TT', 'TV', 'TW', 'TZ',
+  'UA', 'UG', 'US', 'UY', 'UZ',
+  'VA', 'VC', 'VE', 'VN', 'VU',
+  'WS',
+  'YE',
+  'ZA', 'ZM', 'ZW',
 ];
+
+let regionNames = null;
+try {
+  regionNames = new Intl.DisplayNames(['ko'], { type: 'region' });
+} catch {
+  regionNames = null;
+}
+
+export const COUNTRY_LIST = COUNTRY_CODES
+  .map((code) => ({
+    code,
+    name: regionNames ? regionNames.of(code) || code : code,
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
 
 // formData.country(코드)로부터 화면에 보여줄 국가명을 역으로 찾는 헬퍼
 export const getCountryName = (code) => COUNTRY_LIST.find((c) => c.code === code)?.name || '';
@@ -79,6 +104,7 @@ export const mapBackendProfileToFrontend = (data) => {
     languages: Array.isArray(data.languages) ? data.languages.join(', ') : (data.languages || ''),
     englishProficiency: data.english_proficiency || '',
     communicationStyle: data.communication_style || '',
+    timezone: data.timezone || '',
     additionalConsiderations: data.additional_considerations || '',
   };
 };
@@ -101,8 +127,9 @@ export const mapFrontendProfileToBackend = (formData) => {
       
     english_proficiency: formData.englishProficiency || '미지정',
     communication_style: formData.communicationStyle || '미지정',
+    // 스펙(§5.1)의 timezone(IANA 이름, 선택 항목) - 폼에서 따로 입력받지 않고
+    // "지금 이 사람이 접속한 시간대"를 브라우저에서 그대로 자동 감지해서 보낸다.
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     additional_considerations: formData.additionalConsiderations?.trim() || '없음',
-
-
   };
 };

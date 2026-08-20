@@ -13,6 +13,7 @@
 
 .controlBtn {
   flex: 1;
+  width: 100%;
   background: none;
   border: none;
   font-size: 14px;
@@ -45,6 +46,73 @@
 
 .off {
   color: #f87171;
+}
+
+.micWrap {
+  flex: 1;
+  position: relative;
+}
+
+.micWrap .controlBtn {
+  padding: 10px 12px;
+}
+
+.micLevelMeter {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 3px;
+  width: max-content;
+  min-width: 56px;
+  height: 28px;
+  padding: 6px 8px;
+  transform: translateX(-50%) translateY(4px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.96);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+}
+
+.micWrap:hover .micLevelMeter {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.micLevelBar {
+  width: 5px;
+  height: 40%;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.18);
+  transition: height 0.06s linear, background 0.06s linear;
+}
+
+.micLevelBar:nth-child(1) { height: 40%; }
+.micLevelBar:nth-child(2) { height: 55%; }
+.micLevelBar:nth-child(3) { height: 70%; }
+.micLevelBar:nth-child(4) { height: 85%; }
+.micLevelBar:nth-child(5) { height: 100%; }
+
+.micLevelBarActive:nth-child(1),
+.micLevelBarActive:nth-child(2),
+.micLevelBarActive:nth-child(3) {
+  background: #34d399;
+}
+
+.micLevelBarActive:nth-child(4) {
+  background: #facc15;
+}
+
+.micLevelBarActive:nth-child(5) {
+  background: #f87171;
 }
 
 .confirmBackdrop {

@@ -25,6 +25,13 @@
   color: #ffffff;
 }
 
+.participantInfoLocalTime {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
 .participantInfoMeta {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.72);

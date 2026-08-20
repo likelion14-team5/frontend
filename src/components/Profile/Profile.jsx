@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './Profile.module.css';
 import { useDraggable } from '../ParticipantsPanel/useDraggable';
+import { useLocalTime } from '../VideoGrid/useLocalTime';
 import { API_ENDPOINTS, PARTICIPANT_TOKEN_KEY } from '../../constants/meetingSession';
 import {
   mapBackendProfileToFrontend,
@@ -26,6 +27,7 @@ export default function Profile({ meetingId, participantId, onClose }) {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const localTime = useLocalTime(profile?.timezone);
 
   useEffect(() => {
     if (!meetingId || !participantId) return;
@@ -82,16 +84,16 @@ export default function Profile({ meetingId, participantId, onClose }) {
             <div className={styles.name}>
               {profile.nickname}
               {role === 'HOST' && <span className={styles.hostBadge}>호스트</span>}
+              <span className={styles.detail}>
+                {profile.organization}
+                {profile.role && ` · ${profile.role}`}
+              </span>
             </div>
 
             <div className={styles.countryBadge}>
               <span className={styles.countryFlag}>{getFlagEmoji(profile.country)}</span>
               {getCountryName(profile.country)}
-            </div>
-
-            <div className={styles.detail}>
-              {profile.organization}
-              {profile.role && ` · ${profile.role}`}
+              {localTime && <span> · {localTime}</span>}
             </div>
 
             <div className={styles.sectionHeading}>언어 능력</div>

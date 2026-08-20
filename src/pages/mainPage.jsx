@@ -1,4 +1,5 @@
 //npm run dev 서버 열기
+import { useEffect } from 'react';
 import './index.css';
 import Header from '../components/landing/Header';
 import Hero from '../components/landing/Hero';
@@ -33,6 +34,17 @@ export default function App() {
   } = useMeetingModal();
 
   const goToMeeting = useGoToMeeting();
+
+  // 공유 링크로 들어왔다가 프로필이 없어서 되돌아온 경우(?join={meetingId})
+  // 회의 입장 모달을 코드까지 채운 채로 바로 열어준다.
+  useEffect(() => {
+    const joinMeetingId = new URLSearchParams(window.location.search).get('join');
+    if (joinMeetingId) {
+      handleMeetingCodeChange(joinMeetingId);
+      openModal('join');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // JoinCreateForm의 제출 버튼엔 onClick이 없어서(껍데기만) 클릭을 여기서 위임받아 처리한다.
   const handleModalContentClick = (e) => {

@@ -51,16 +51,26 @@ export function useDailyCall(meetingId) {
         const rawProfile = sessionStorage.getItem(MEETING_PROFILE_STORAGE_KEY);
         const meetingProfile = rawProfile ? JSON.parse(rawProfile) : null;
         const myProfile = meetingProfile?.profile;
+        const myParticipantId =
+          meetingProfile?.participantId ||
+          meetingProfile?.profile?.participantId ||
+          meetingProfile?.me?.id ||
+          null;
 
         setCallObject(co);
         await co.join({
           url: room_url,
           token: meeting_token,
           userData: {
+            participantId: myParticipantId,
             role: myProfile?.role || "",
             country: myProfile?.country || "",
             englishProficiency: myProfile?.englishProficiency || "",
+            communicationStyle: myProfile?.communicationStyle || "",
             meetingRole: meetingProfile?.meetingRole || "MEMBER",
+            // 참가자 카드에 "현지 시각"을 보여주기 위한 시간대(스펙 4.4) - 프로필 저장 시점이 아니라
+            // 지금 이 순간 이 브라우저의 시간대를 그대로 보낸다(둘이 어긋날 일이 없음).
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         });
       } catch (err) {
