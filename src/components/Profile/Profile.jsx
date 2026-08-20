@@ -90,10 +90,9 @@ export default function Profile({ meetingId, participantId, onClose }) {
               </span>
             </div>
 
-            <div className={styles.countryBadge}>
-              <span className={styles.countryFlag}>{getFlagEmoji(profile.country)}</span>
-              {getCountryName(profile.country)}
-              {localTime && <span> · {localTime}</span>}
+            <div className={styles.detail}>
+              {getFlagEmoji(profile.country)} {getCountryName(profile.country)}
+              {localTime && ` · ${localTime}`}
             </div>
 
             <div className={styles.sectionHeading}>언어 능력</div>

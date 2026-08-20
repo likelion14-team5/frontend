@@ -12,8 +12,8 @@ export default function HeaderBar({ children, mobileMenu }) {
     <header className="header">
       <div className="header-inner">
         <div className="logo-group">
-          <div className="logo-icon">L</div>
-          <span className="logo">SamePage</span>
+          <div className="logo-icon">A</div>
+          <span className="logo">Attune</span>
         </div>
 
         {children}

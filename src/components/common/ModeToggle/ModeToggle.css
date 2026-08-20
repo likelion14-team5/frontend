@@ -16,7 +16,7 @@
 
 .mode-toggle-label {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.85);
+  color: #3f4250;
   font-weight: 500;
 }
 
@@ -40,6 +40,6 @@
 }
 
 .mode-toggle-pill.off {
-  background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.6);
+  background: #e9eaf2;
+  color: #8a8d99;
 }
