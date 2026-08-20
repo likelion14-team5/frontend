@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import styles from '../HeaderBar/MeetingInfoModal.module.css';
+import { useLanguage } from '../../../hooks/useLanguage.jsx';
 
 export default function MeetingInfoModal({ meetingInfo, onCopyLink }) {
+  const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   const handleCopyClick = () => {
@@ -16,23 +18,23 @@ export default function MeetingInfoModal({ meetingInfo, onCopyLink }) {
 
   return (
     <div className={styles.dropdownCard}>
-      <h2 className={styles.title}>회의 정보</h2>
+      <h2 className={styles.title}>{t('meetingInfoModal.title')}</h2>
       <div className={styles.infoGrid}>
-        <div className={styles.infoLabel}>회의 이름</div>
-        <div className={styles.infoValue}>{title || '불러오는 중...'}</div>
+        <div className={styles.infoLabel}>{t('meetingInfoModal.nameLabel')}</div>
+        <div className={styles.infoValue}>{title || t('meetingInfoModal.loading')}</div>
 
-        <div className={styles.infoLabel}>시작 시간</div>
+        <div className={styles.infoLabel}>{t('meetingInfoModal.startTimeLabel')}</div>
         <div className={styles.infoValue}>
-          {created_at ? new Date(created_at).toLocaleString() : '불러오는 중...'}
+          {created_at ? new Date(created_at).toLocaleString() : t('meetingInfoModal.loading')}
         </div>
 
-        <div className={styles.infoLabel}>참여 인원</div>
+        <div className={styles.infoLabel}>{t('meetingInfoModal.participantsLabel')}</div>
         <div className={styles.infoValue}>
           {current_participants ?? '...'} / {max_participants ?? '...'}
         </div>
       </div>
       <button type="button" className={styles.copyButton} onClick={handleCopyClick}>
-        {copied ? '복사됨' : '초대 링크 복사'}
+        {copied ? t('meetingInfoModal.copiedButton') : t('meetingInfoModal.copyButton')}
       </button>
     </div>
   );

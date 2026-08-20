@@ -23,6 +23,18 @@
   z-index: 2;
 }
 
+/* 좁은 화면에서는 meeting-main-row가 세로로 쌓이므로 리사이즈 가능한 고정 픽셀 너비 대신
+   전체 너비를 차지하게 한다 (드래그 리사이즈도 의미 없어져서 숨김). */
+@media (max-width: 900px) {
+  .sidePanel {
+    width: 100% !important;
+  }
+
+  .resizeHandle {
+    display: none;
+  }
+}
+
 /* 패널이 두 개(표현변환 + 피드백) 다 켜져서 쌓일 때만 자동으로 구분선 생김 */
 .sidePanel > * + * {
   border-top: 1px solid var(--color-border);
@@ -60,7 +72,7 @@
 
 .fieldRow {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
   margin-bottom: 12px;
 }
@@ -68,6 +80,7 @@
 .fieldLabel {
   font-size: 12px;
   color: var(--color-text-faint);
+  flex-shrink: 0;
 }
 
 .fieldLabelStandalone {
@@ -77,8 +90,31 @@
 }
 
 .fieldValue {
-  font-size: 12px;
+  flex: 1;
+  font-size: 13px;
   font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 28px 8px 10px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.fieldValue:hover {
+  border-color: var(--color-text-faint);
+}
+
+.fieldValue:focus {
+  outline: none;
+  border-color: var(--color-dark);
 }
 
 .primaryButton {

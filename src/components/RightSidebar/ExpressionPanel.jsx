@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./RightSidebar.module.css";
 import { useExpressionTranslate } from "./useExpressionTranslate";
+import { useLanguage } from "../../hooks/useLanguage.jsx";
 
 export default function ExpressionPanel({ 
   meetingId,
@@ -10,6 +11,7 @@ export default function ExpressionPanel({
   myParticipantId,   // 내 참가자 ID Props
   onChangeFeedbackTarget // 대상 변경 핸들러 Props
 }) {
+  const { t } = useLanguage();
   const [input, setInput] = useState(initialInput);
   const { result, loading, error, generate } = useExpressionTranslate(meetingId);
 
@@ -32,7 +34,7 @@ export default function ExpressionPanel({
 
     // UUID 형식(36자리)이 아니면 백엔드가 404를 뱉으므로 예외 처리
     if (!targetIdToSend || targetIdToSend.length < 30) {
-      alert("참가자 프로필 동기화 중입니다. 잠시 후 다시 시도해 주세요.");
+      alert(t('expressionPanel.syncingAlert'));
       return;
     }
 
@@ -41,17 +43,17 @@ export default function ExpressionPanel({
 
   return (
     <section className={styles.panelBlock}>
-      <h2 className={styles.panelTitle}>발언 전 표현 변환</h2>
+      <h2 className={styles.panelTitle}>{t('expressionPanel.title')}</h2>
 
       <div className={styles.fieldRow}>
-        <span className={styles.fieldLabel}>대상</span>
+        <span className={styles.fieldLabel}>{t('expressionPanel.targetLabel')}</span>
 
         <select
           className={styles.fieldValue}
           value={selectedTargetId}
           onChange={handleTargetChange}
         >
-          <option value="">대상을 선택하세요</option>
+          <option value="">{t('expressionPanel.targetPlaceholder')}</option>
 
           {participants
             .filter((p) => {
@@ -62,8 +64,8 @@ export default function ExpressionPanel({
             })
             .map((p) => {
               const pId = p.participantId || p.id;
-              const name = p.nickname || p.name || p.profile?.nickname || p.profile?.name || "참가자";
-              
+              const name = p.nickname || p.name || p.profile?.nickname || p.profile?.name || t('meetingRoom.defaultParticipantName');
+
               return (
                 <option key={pId} value={pId}>
                   {name}
@@ -79,7 +81,7 @@ export default function ExpressionPanel({
         value={input}
         onChange={(e) => setInput(e.target.value)}
         rows={2}
-        placeholder="하고 싶은 말을 입력하세요"
+        placeholder={t('expressionPanel.inputPlaceholder')}
       />
 
       <button
@@ -88,14 +90,14 @@ export default function ExpressionPanel({
         onClick={handleGenerate}
         disabled={loading}
       >
-        {loading ? "생성 중..." : "영어 표현 만들기"}
+        {loading ? t('expressionPanel.generating') : t('expressionPanel.generateButton')}
       </button>
 
       {error && <p className={styles.resultNote}>⚠️ {error}</p>}
 
       {result && (
         <div className={styles.resultCard}>
-          <div className={styles.resultLabel}>추천 표현</div>
+          <div className={styles.resultLabel}>{t('expressionPanel.resultLabel')}</div>
           <p className={styles.resultText}>{result.text}</p>
           <p className={styles.resultNote}>{result.note}</p>
         </div>

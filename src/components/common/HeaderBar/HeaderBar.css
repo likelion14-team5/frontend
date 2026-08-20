@@ -8,12 +8,30 @@
   display: flex;
   align-items: center;
   gap: 32px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.meeting-info-trigger-wrap {
+  position: relative;
 }
 
 .header-toggle-group {
   display: flex;
   align-items: center;
   gap: 24px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .header-right-group {
+    gap: 16px;
+  }
+
+  .header-toggle-group {
+    gap: 12px;
+  }
 }
 
 .avatar {

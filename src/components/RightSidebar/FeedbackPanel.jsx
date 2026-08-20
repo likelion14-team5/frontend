@@ -1,5 +1,6 @@
 import styles from "./RightSidebar.module.css";
 import { Radio } from 'lucide-react';
+import { useLanguage } from '../../hooks/useLanguage.jsx';
 
 const RISK_TYPE_LABELS = {
   DIRECT_REJECTION: "직접적 거절",
@@ -10,20 +11,21 @@ const RISK_TYPE_LABELS = {
 };
 
 export default function FeedbackPanel({ feedback, onClose }) {
+  const { t } = useLanguage();
   const riskLabel = feedback ? (RISK_TYPE_LABELS[feedback.riskType] || feedback.riskType) : null;
 
   return (
     <section className={styles.panelBlock}>
       <h2 className={styles.panelTitle} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Radio className="w-5 h-5 text-red-500 animate-pulse shrink-0" />
-        <span>발언 직후 피드백</span>
+        <span>{t('feedbackPanel.title')}</span>
       </h2>
 
       {/* 아직 아무 발언도 감지되지 않았을 때는 대기 중이라는 안내 문구를 보여준다. */}
-      <div className={styles.fieldLabelStandalone}>방금 감지한 발언</div>
+      <div className={styles.fieldLabelStandalone}>{t('feedbackPanel.detectedLabel')}</div>
       <div className={styles.quoteBox}>
         <p className={styles.quoteText}>
-          {feedback ? <>&ldquo;{feedback.detected}&rdquo;</> : '아직 감지된 발언이 없습니다.'}
+          {feedback ? <>&ldquo;{feedback.detected}&rdquo;</> : t('feedbackPanel.noDetectionYet')}
         </p>
         {feedback?.mayBeInaccurate && (
           <p style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>
@@ -34,7 +36,7 @@ export default function FeedbackPanel({ feedback, onClose }) {
 
       <div className={styles.warningBox}>
         <div className={styles.warningTitle} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          이렇게 들릴 수 있어요
+          {t('feedbackPanel.warningTitle')}
           {riskLabel && (
             <span style={{
               fontSize: '11px',
@@ -48,11 +50,11 @@ export default function FeedbackPanel({ feedback, onClose }) {
           )}
         </div>
         <p className={styles.warningText}>
-          {feedback ? feedback.warning : '감지하면 피드백을 작성합니다.'}
+          {feedback ? feedback.warning : t('feedbackPanel.waitingText')}
         </p>
         {feedback && (
           <p className={styles.altText}>
-            <span className={styles.altLabel}>대안</span> {feedback.alternative}
+            <span className={styles.altLabel}>{t('feedbackPanel.alternativeLabel')}</span> {feedback.alternative}
           </p>
         )}
       </div>
@@ -62,7 +64,7 @@ export default function FeedbackPanel({ feedback, onClose }) {
         className={styles.secondaryButton}
         onClick={onClose}
       >
-        피드백 닫기
+        {t('feedbackPanel.closeButton')}
       </button>
     </section>
   );

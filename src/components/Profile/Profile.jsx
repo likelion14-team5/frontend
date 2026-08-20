@@ -9,6 +9,7 @@ import {
   getEnglishProficiencyLabel,
   getCommunicationStyleLabel,
 } from '../../constants/profileOptions';
+import { useLanguage } from '../../hooks/useLanguage.jsx';
 
 // ISO 국가 코드(예: "KR") -> 국기 이모지. 유니코드 지역표시문자로 변환.
 function getFlagEmoji(countryCode) {
@@ -22,6 +23,7 @@ function getFlagEmoji(countryCode) {
 // 전체 화면을 덮는 모달이 아니라, ParticipantsPanel과 같은 방식(드래그 가능한 플로팅 카드)으로 띄운다.
 // GET /meetings/{meetingId}/participants/{participantId}로 실제 프로필을 받아온다.
 export default function Profile({ meetingId, participantId, onClose }) {
+  const { t } = useLanguage();
   const { position, handleMouseDown } = useDraggable({ x: 0, y: 0 });
   const [profile, setProfile] = useState(null);
   const [role, setRole] = useState(null);
@@ -45,7 +47,7 @@ export default function Profile({ meetingId, participantId, onClose }) {
         );
         const body = await response.json();
         if (!response.ok) {
-          throw new Error(body?.error?.message ?? '프로필을 불러오지 못했습니다.');
+          throw new Error(body?.error?.message ?? t('participantProfile.loadFailedError'));
         }
         if (cancelled) return;
         setProfile(mapBackendProfileToFrontend(body.data.profile));
@@ -69,21 +71,21 @@ export default function Profile({ meetingId, participantId, onClose }) {
       style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
     >
       <div className={styles.header} onMouseDown={handleMouseDown}>
-        <span className={styles.title}>참가자 상세 프로필</span>
+        <span className={styles.title}>{t('participantProfile.title')}</span>
         <button type="button" className={styles.closeBtn} onClick={onClose}>
           ✕
         </button>
       </div>
 
       <div className={styles.body}>
-        {loading && <p className={styles.status}>불러오는 중...</p>}
+        {loading && <p className={styles.status}>{t('participantProfile.loading')}</p>}
         {error && <p className={styles.status}>{error}</p>}
 
         {profile && !loading && !error && (
           <>
             <div className={styles.name}>
               {profile.nickname}
-              {role === 'HOST' && <span className={styles.hostBadge}>호스트</span>}
+              {role === 'HOST' && <span className={styles.hostBadge}>{t('participantProfile.hostBadge')}</span>}
               <span className={styles.detail}>
                 {profile.organization}
                 {profile.role && ` · ${profile.role}`}
@@ -95,16 +97,16 @@ export default function Profile({ meetingId, participantId, onClose }) {
               {localTime && ` · ${localTime}`}
             </div>
 
-            <div className={styles.sectionHeading}>언어 능력</div>
-            <div className={styles.detail}>주 사용 언어: {profile.languages}</div>
+            <div className={styles.sectionHeading}>{t('participantProfile.languageSectionTitle')}</div>
+            <div className={styles.detail}>{t('participantProfile.mainLanguageLabel')} {profile.languages}</div>
             <div className={styles.detail}>
-              영어 실력: {getEnglishProficiencyLabel(profile.englishProficiency)}
+              {t('participantProfile.englishLevelLabel')} {profile.englishProficiency ? t(`profileOptions.englishProficiency.${profile.englishProficiency}`) : getEnglishProficiencyLabel(profile.englishProficiency)}
             </div>
             <div className={styles.detail}>
-              대화 방식: {getCommunicationStyleLabel(profile.communicationStyle)}
+              {t('participantProfile.communicationLabel')} {profile.communicationStyle ? t(`profileOptions.communicationStyle.${profile.communicationStyle}`) : getCommunicationStyleLabel(profile.communicationStyle)}
             </div>
             <div className={styles.note}>
-              참고사항: {profile.additionalConsiderations || '없음'}
+              {t('participantProfile.noteLabel')} {profile.additionalConsiderations || t('participantProfile.noteEmpty')}
             </div>
           </>
         )}

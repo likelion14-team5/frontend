@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 
 export function useMeetingModal() {
   const [activeModal, setActiveModal] = useState('none'); // 'none' | 'join' | 'profile'
+  // 프로필 창을 닫을 때 돌아갈 곳: 헤더 "내 정보"로 열었으면 'none'(완전히 닫힘),
+  // "회의 입장/생성" 흐름 중 "프로필 수정"으로 열었으면 'join'(그 화면으로 복귀).
+  const [profileModalOrigin, setProfileModalOrigin] = useState('none');
   const [meetingTab, setMeetingTab] = useState('join'); // 'join' | 'create'
   const [meetingCode, setMeetingCode] = useState('');
   const [newMeetingTitle, setNewMeetingTitle] = useState('');
@@ -38,10 +41,11 @@ export function useMeetingModal() {
     // openModal과 동일하게, 진짜 회의가 생성되기 전까지는 가짜 링크를 만들지 않는다.
   };
 
-  // 프로필 창은 "내 정보"(헤더)나 회의 입장 흐름 중("프로필 수정") 어디서 열렸든,
-  // X든 저장이든 닫으면 항상 완전히 닫힌다(랜딩으로) - 이전 모달로 돌아가지 않는다.
-  const openProfileModal = () => setActiveModal('profile');
-  const closeProfileModal = () => setActiveModal('none');
+  const openProfileModal = () => {
+    setProfileModalOrigin(activeModal === 'join' ? 'join' : 'none');
+    setActiveModal('profile');
+  };
+  const closeProfileModal = () => setActiveModal(profileModalOrigin);
 
   return {
     activeModal,
