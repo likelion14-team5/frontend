@@ -1,23 +1,13 @@
-import { useRef, useState } from 'react';
-import { useClickOutside } from '../../hooks/useClickOutside';
+import { useState } from 'react';
 import HeaderBar from '../common/HeaderBar/HeaderBar';
 
 // props:
-//   onOpenModal(tab) - 모바일 메뉴의 "회의 입장하기" / "+ 새 회의 만들기" 버튼에서 호출
+//   onOpenModal(tab)  - 모바일 메뉴의 "회의 입장하기" / "+ 새 회의 만들기" 버튼에서 호출
 //                       tab은 'join' | 'create'
-export default function Header({ onOpenModal }) {
+//   onOpenProfile()   - "내 정보" 클릭 시 - 회의 입장 없이 프로필만 미리 작성/저장할 수 있게
+export default function Header({ onOpenModal, onOpenProfile }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const [uiLanguage, setUiLanguage] = useState('한국어');
-  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const [isMobileLangMenuOpen, setIsMobileLangMenuOpen] = useState(false);
-
-  const langMenuRef = useRef(null);
-  const mobileLangMenuRef = useRef(null);
-
-  useClickOutside(langMenuRef, () => setIsLangMenuOpen(false));
-  useClickOutside(mobileLangMenuRef, () => setIsMobileLangMenuOpen(false));
 
   const mobileMenu = isMobileMenuOpen && (
     <div className="mobile-drawer overlay-fade">
@@ -41,40 +31,16 @@ export default function Header({ onOpenModal }) {
       </div>
 
       <div className="mobile-menu-list">
-        <div className="mobile-menu-item">도움말</div>
         <div
-          className="mobile-menu-item lang-item"
-          ref={mobileLangMenuRef}
-          onClick={() => setIsMobileLangMenuOpen((prev) => !prev)}
+          className="mobile-menu-item"
+          onClick={() => {
+            setIsMobileMenuOpen(false);
+            onOpenProfile();
+          }}
         >
-          {uiLanguage === '한국어' ? 'KR' : 'US'} {uiLanguage}
-
-          {isMobileLangMenuOpen && (
-            <div
-              className="mobile-lang-dropdown"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                className={`mobile-lang-option ${uiLanguage === '한국어' ? 'selected' : ''}`}
-                onClick={() => {
-                  setUiLanguage('한국어');
-                  setIsMobileLangMenuOpen(false);
-                }}
-              >
-                KR 한국어
-              </div>
-              <div
-                className={`mobile-lang-option ${uiLanguage === 'English' ? 'selected' : ''}`}
-                onClick={() => {
-                  setUiLanguage('English');
-                  setIsMobileLangMenuOpen(false);
-                }}
-              >
-                US English
-              </div>
-            </div>
-          )}
+          내 정보
         </div>
+        <div className="mobile-menu-item">도움말</div>
       </div>
 
       <div className="mobile-menu-actions">
@@ -103,39 +69,10 @@ export default function Header({ onOpenModal }) {
   return (
     <HeaderBar mobileMenu={mobileMenu}>
       <nav className="header-right desktop-only">
+        <span className="header-link" onClick={onOpenProfile} role="button" tabIndex={0}>
+          내 정보
+        </span>
         <span className="header-link">도움말</span>
-        <div className="lang-selector" ref={langMenuRef}>
-          <button
-            type="button"
-            className="header-start-btn"
-            onClick={() => setIsLangMenuOpen((prev) => !prev)}
-          >
-            {uiLanguage === '한국어' ? 'KR' : 'US'} {uiLanguage}
-          </button>
-
-          {isLangMenuOpen && (
-            <div className="lang-dropdown">
-              <div
-                className={`lang-option ${uiLanguage === '한국어' ? 'selected' : ''}`}
-                onClick={() => {
-                  setUiLanguage('한국어');
-                  setIsLangMenuOpen(false);
-                }}
-              >
-                KR 한국어
-              </div>
-              <div
-                className={`lang-option ${uiLanguage === 'English' ? 'selected' : ''}`}
-                onClick={() => {
-                  setUiLanguage('English');
-                  setIsLangMenuOpen(false);
-                }}
-              >
-                US English
-              </div>
-            </div>
-          )}
-        </div>
       </nav>
 
       <button

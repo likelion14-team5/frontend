@@ -38,8 +38,10 @@ export function useMeetingModal() {
     // openModal과 동일하게, 진짜 회의가 생성되기 전까지는 가짜 링크를 만들지 않는다.
   };
 
+  // 프로필 창은 "내 정보"(헤더)나 회의 입장 흐름 중("프로필 수정") 어디서 열렸든,
+  // X든 저장이든 닫으면 항상 완전히 닫힌다(랜딩으로) - 이전 모달로 돌아가지 않는다.
   const openProfileModal = () => setActiveModal('profile');
-  const closeProfileModal = () => setActiveModal('join');
+  const closeProfileModal = () => setActiveModal('none');
 
   return {
     activeModal,

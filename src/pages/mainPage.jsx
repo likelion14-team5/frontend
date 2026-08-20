@@ -70,7 +70,7 @@ export default function App() {
       <div className="bg-glow-main" />
       <div className="bg-glow-sub" />
 
-      <Header onOpenModal={openModal} />
+      <Header onOpenModal={openModal} onOpenProfile={openProfileModal} />
       <Hero onOpenModal={openModal} />
 
       {/* 모달 팝업 오버레이 */}

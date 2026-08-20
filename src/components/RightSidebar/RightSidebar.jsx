@@ -133,14 +133,7 @@ export default function RightSidebar({
             />
           )}
           {feedbackOn && (
-            <FeedbackPanel
-              feedback={feedback || {
-                detected: "That schedule is impossible.",
-                warning: "상대의 계획을 단정적으로 거절하는 표현으로 받아들여질 수 있습니다.",
-                alternative: "Could we discuss an alternative schedule?",
-              }}
-              onClose={onCloseFeedback}
-            />
+            <FeedbackPanel feedback={feedback} onClose={onCloseFeedback} />
           )}
         </>
       )}

@@ -7,7 +7,7 @@ import {
   getCountryName,
 } from '../../constants/profileOptions';
 
-export default function ProfileForm({ initialProfile, onSave }) {
+export default function ProfileForm({ initialProfile, onSave, saving = false }) {
   const [formData, setFormData] = useState(initialProfile);
   const [countryQuery, setCountryQuery] = useState(getCountryName(initialProfile.country));
   const [errors, setErrors] = useState({});
@@ -296,8 +296,8 @@ export default function ProfileForm({ initialProfile, onSave }) {
           />
         </div>
 
-        <button type="submit" className="submit-button mt-4">
-          저장하고 돌아가기
+        <button type="submit" className="submit-button mt-4" disabled={saving}>
+          {saving ? '저장 중...' : '저장하고 돌아가기'}
         </button>
       </form>
     </div>
