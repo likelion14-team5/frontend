@@ -63,7 +63,7 @@ export default function Profile({ meetingId, participantId, onClose }) {
     return () => {
       cancelled = true;
     };
-  }, [meetingId, participantId]);
+  }, [meetingId, participantId, t]);
 
   return (
     <div

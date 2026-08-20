@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 import ko from '../locales/ko.json';
 import en from '../locales/en.json';
 
@@ -32,12 +32,12 @@ export function LanguageProvider({ children }) {
     }
   };
 
-  const t = (key) => {
+  const t = useCallback((key) => {
     const value = resolveKey(LOCALES[language], key);
     if (value !== undefined) return value;
     // 번역 누락 시 한국어로 대체하고, 그마저 없으면 key 자체를 보여줘서 누락을 바로 알아챌 수 있게 함
     return resolveKey(LOCALES.ko, key) ?? key;
-  };
+  }, [language]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>
@@ -46,6 +46,7 @@ export function LanguageProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Context + 훅을 한 파일에 두는 흔한 패턴, Fast Refresh 규칙은 무시해도 됨
 export function useLanguage() {
   const ctx = useContext(LanguageContext);
   if (!ctx) throw new Error('useLanguage must be used within LanguageProvider');
