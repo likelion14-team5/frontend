@@ -1,4 +1,5 @@
-import { COMMUNICATION_STYLE_OPTIONS, getCountryName } from '../../constants/profileOptions';
+import { getCountryName } from '../../constants/profileOptions';
+import { useLanguage } from '../../hooks/useLanguage.jsx';
 
 // props:
 //   meetingTab, onTabChange(tab)                         - 'join' | 'create' 탭 전환
@@ -25,6 +26,8 @@ export default function JoinCreateForm({
   voiceAnalysisConsent,
   onVoiceAnalysisConsentChange,
 }) {
+  const { t } = useLanguage();
+
   return (
     <div>
       <div className="tab-container">
@@ -32,22 +35,22 @@ export default function JoinCreateForm({
           className={`tab-button ${meetingTab === 'join' ? 'active' : ''}`}
           onClick={() => onTabChange('join')}
         >
-          회의 입장하기
+          {t('joinCreateForm.tabJoin')}
         </button>
         <button
           className={`tab-button ${meetingTab === 'create' ? 'active' : ''}`}
           onClick={() => onTabChange('create')}
         >
-          새 회의 만들기
+          {t('joinCreateForm.tabCreate')}
         </button>
       </div>
 
       {meetingTab === 'join' && (
         <div>
-          <p className="card-subtitle">저장된 프로필로 바로 입장합니다.</p>
+          <p className="card-subtitle">{t('joinCreateForm.joinSubtitle')}</p>
 
           <div className="form-group">
-            <label className="label">회의 코드 또는 링크</label>
+            <label className="label">{t('joinCreateForm.meetingCodeLabel')}</label>
             <input
               type="text"
               value={meetingCode}
@@ -62,7 +65,7 @@ export default function JoinCreateForm({
                   onMeetingCodeChange(rawValue);
                 }
               }}
-              placeholder="공유받은 회의 링크를 입력해주세요"
+              placeholder={t('joinCreateForm.meetingCodePlaceholder')}
               className="input"
             />
           </div>
@@ -71,21 +74,21 @@ export default function JoinCreateForm({
 
       {meetingTab === 'create' && (
         <div>
-          <p className="card-subtitle">새로운 회의를 개설하고 전용 코드를 생성합니다.</p>
+          <p className="card-subtitle">{t('joinCreateForm.createSubtitle')}</p>
 
           <div className="form-group">
-            <label className="label">회의 주제 / 제목</label>
+            <label className="label">{t('joinCreateForm.meetingTitleLabel')}</label>
             <input
               type="text"
               value={newMeetingTitle}
               onChange={(e) => onTitleChange(e.target.value)}
-              placeholder="예: 글로벌 마케팅 주간 회의 (필수)"
+              placeholder={t('joinCreateForm.meetingTitlePlaceholder')}
               className="input"
             />
           </div>
 
           <div className="form-group">
-            <label className="label">최대 참가 인원</label>
+            <label className="label">{t('joinCreateForm.maxParticipantsLabel')}</label>
             <div className="participant-count-group">
               {[2, 3, 4].map((n) => (
                 <button
@@ -94,17 +97,17 @@ export default function JoinCreateForm({
                   className={`count-option ${maxParticipants === n ? 'active' : ''}`}
                   onClick={() => onMaxParticipantsChange(n)}
                 >
-                  {n}명
+                  {n}{t('joinCreateForm.participantUnit')}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="form-group">
-            <label className="label">초대 링크</label>
+            <label className="label">{t('joinCreateForm.inviteLinkLabel')}</label>
             <div className="code-display-box">
               <span className="code-text">
-                회의를 생성하면 회의 화면에서 초대 링크를 복사할 수 있어요.
+                {t('joinCreateForm.inviteLinkNotice')}
               </span>
             </div>
           </div>
@@ -112,25 +115,23 @@ export default function JoinCreateForm({
       )}
 
       <div className="profile-summary-box">
-        <div className="summary-label">사용할 프로필</div>
+        <div className="summary-label">{t('joinCreateForm.profileSummaryLabel')}</div>
         <div className="summary-name">
-          {savedProfile.nickname.trim() ? savedProfile.nickname : '프로필을 입력해주세요'}
+          {savedProfile.nickname.trim() ? savedProfile.nickname : t('joinCreateForm.profileNotSet')}
           {savedProfile.role.trim() && ` · ${savedProfile.role}`}
         </div>
         <div className="summary-details">
-          {savedProfile.country ? getCountryName(savedProfile.country) : '국가 미지정'}
+          {savedProfile.country ? getCountryName(savedProfile.country) : t('joinCreateForm.countryNotSet')}
           {savedProfile.languages.trim() && ` · ${savedProfile.languages}`}
         </div>
         <div className="summary-details">
           {savedProfile.communicationStyle
-            ? COMMUNICATION_STYLE_OPTIONS.find(
-                (o) => o.value === savedProfile.communicationStyle
-              )?.label
-            : '소통 방식 미지정'}
+            ? t(`profileOptions.communicationStyle.${savedProfile.communicationStyle}`)
+            : t('joinCreateForm.communicationStyleNotSet')}
         </div>
 
         <button className="edit-profile-button" onClick={onEditProfile}>
-          프로필 수정
+          {t('joinCreateForm.editProfileButton')}
         </button>
       </div>
 
@@ -141,7 +142,7 @@ export default function JoinCreateForm({
           onChange={(e) => onProfileSharingConsentChange(e.target.checked)}
           className="checkbox"
         />
-        프로필 공개에 동의합니다. (필수)
+        {t('joinCreateForm.consentProfileSharing')}
       </label>
 
       <label className="checkbox-label">
@@ -153,9 +154,9 @@ export default function JoinCreateForm({
         />
 
         <div>
-          <div>내 음성 분석(발언 피드백)에 동의합니다. (선택)</div>
+          <div>{t('joinCreateForm.consentVoiceAnalysis')}</div>
           <span className="checkbox-description">
-            비동의 시 일부 기능 이용이 제한될 수 있습니다.
+            {t('joinCreateForm.consentVoiceAnalysisDescription')}
           </span>
         </div>
       </label>
@@ -165,14 +166,14 @@ export default function JoinCreateForm({
           className="submit-button"
           disabled={!profileSharingConsent || !meetingCode.trim()}
         >
-          회의 입장
+          {t('joinCreateForm.submitJoin')}
         </button>
       ) : (
         <button
           className="submit-button"
           disabled={!profileSharingConsent || !newMeetingTitle.trim()}
         >
-          회의 생성 및 입장
+          {t('joinCreateForm.submitCreate')}
         </button>
       )}
     </div>

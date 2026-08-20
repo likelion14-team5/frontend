@@ -14,14 +14,14 @@
 
 .controlBtn {
   flex: 1;
-  width: 100%;
+  min-width: 0;
   background: none;
   border: none;
   font-size: 14px;
   font-weight: 700;
   color: #3f4250;
   cursor: pointer;
-  padding: 10px 12px;
+  padding: 10px 8px;
   border-radius: 10px;
   transition: background 0.15s;
 }
@@ -31,6 +31,23 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .controlBar {
+    gap: 2px;
+    padding: 8px 4px;
+  }
+
+  .controlBtn {
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+
+  .buttonContent {
+    gap: 4px;
+  }
 }
 
 .controlBtn:hover {

@@ -1,4 +1,5 @@
 import styles from './ParticipantInfoBar.module.css';
+import { useLanguage } from '../../hooks/useLanguage.jsx';
 
 // props:
 //   participant   - { id, name, country, role, communicationStyle, localTime }
@@ -8,6 +9,7 @@ import styles from './ParticipantInfoBar.module.css';
 // 국가/직무/대화 방식을 클릭 없이 항상 보이게 한다 - 다국적 회의에서
 // "이 사람과 어떻게 소통해야 하는지" 힌트를 매번 프로필을 열어보지 않아도 알 수 있게.
 export default function ParticipantInfoBar({ participant, isSelf, onViewProfile }) {
+  const { t } = useLanguage();
   if (!participant) return null;
   const profileMeta = [
     participant.country,
@@ -22,7 +24,7 @@ export default function ParticipantInfoBar({ participant, isSelf, onViewProfile 
       <div className={styles.participantInfoText}>
         <div className={styles.participantInfoName}>
           {participant.name}
-          {isSelf && ' (나)'}
+          {isSelf && t('participantInfoBar.selfSuffix')}
           {/* 다른 시간대에 있는 참가자와 회의할 때 "지금 저 사람은 몇 시지"를 바로 알 수 있게. */}
           {participant.localTime && (
             <span className={styles.participantInfoLocalTime}>{participant.localTime}</span>
@@ -35,7 +37,7 @@ export default function ParticipantInfoBar({ participant, isSelf, onViewProfile 
         className={styles.participantInfoDetailBtn}
         onClick={() => onViewProfile?.(participant.id)}
       >
-        프로필 상세
+        {t('participantInfoBar.detailButton')}
       </button>
     </div>
   );

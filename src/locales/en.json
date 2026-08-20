@@ -1,0 +1,175 @@
+{
+  "header": {
+    "myInfo": "My Info",
+    "help": "Help",
+    "menuOpen": "Open menu",
+    "searchPlaceholder": "Search...",
+    "joinMeeting": "Join Meeting",
+    "createMeeting": "+ New Meeting"
+  },
+  "hero": {
+    "badge": "Real-time support AI for global teams",
+    "titleLine1": "Breaking down barriers of language and culture,",
+    "titleHighlight": "Global AI Meetings",
+    "titleSuffix": " redefined",
+    "subtitleLine1": "Real-time speech refinement, cultural communication etiquette guidance, pre-shared profiles",
+    "subtitleLine2": "Communicate naturally and without misunderstanding with teammates around the world, as if you were in the same room.",
+    "joinMeeting": "Join a Meeting",
+    "createMeeting": "Create a Meeting"
+  },
+  "previewMockup": {
+    "windowTitle": "AI Work PreView",
+    "liveBadge": "· LIVE REFINING ACTIVE",
+    "col1Label": "🎙️ Real-time Speech Sync",
+    "detectedTag": "Just detected",
+    "speakerName": "KR glidong hong (FrontEnd)",
+    "detectedQuote": "\"That schedule is impossible.\"",
+    "feedbackTag": "🤖 Live feedback",
+    "feedbackText": "This may come across as a blunt refusal of the other person's plan.",
+    "alternativeLabel": "Alternative:",
+    "alternativeText": "Could we discuss an alternative schedule?",
+    "col2Label": "✍️ Pre-Speech Assist",
+    "translateTag": "🤖 Translate before speaking",
+    "inputLabel": "What I want to say (Korean)",
+    "inputText": "\"이 부분은 마감 전에 한 번 더 확인해주시면 좋을 것 같아요.\"",
+    "resultLabel": "Recommended English phrase",
+    "resultText": "\"It would be great if you could take one more look at this before the deadline.\"",
+    "reasonLabel": "Why:",
+    "reasonText": "Reworded the request as a soft suggestion so it feels easier for the other person to accept."
+  },
+  "joinCreateForm": {
+    "tabJoin": "Join Meeting",
+    "tabCreate": "New Meeting",
+    "joinSubtitle": "Join instantly with your saved profile.",
+    "meetingCodeLabel": "Meeting code or link",
+    "meetingCodePlaceholder": "Enter the meeting link you received",
+    "createSubtitle": "Start a new meeting and generate a dedicated code.",
+    "meetingTitleLabel": "Meeting topic / title",
+    "meetingTitlePlaceholder": "e.g. Global Marketing Weekly Sync (required)",
+    "maxParticipantsLabel": "Max participants",
+    "participantUnit": "",
+    "inviteLinkLabel": "Invite link",
+    "inviteLinkNotice": "Once you create the meeting, you can copy the invite link from the meeting screen.",
+    "profileSummaryLabel": "Profile in use",
+    "profileNotSet": "Please fill in your profile",
+    "countryNotSet": "Country not set",
+    "communicationStyleNotSet": "Communication style not set",
+    "editProfileButton": "Edit Profile",
+    "consentProfileSharing": "I agree to share my profile. (required)",
+    "consentVoiceAnalysis": "I agree to voice analysis (speech feedback). (optional)",
+    "consentVoiceAnalysisDescription": "Some features may be limited if you don't agree.",
+    "submitJoin": "Join Meeting",
+    "submitCreate": "Create & Join Meeting"
+  },
+  "profileForm": {
+    "titleEdit": "Edit Profile",
+    "requiredError": "Required",
+    "nicknameLabel": "Name or nickname",
+    "nicknamePlaceholder": "Enter your name or nickname",
+    "countryLabel": "Country",
+    "countryPlaceholder": "Search country (e.g. Korea, USA)",
+    "countryNoResult": "You can only pick a country from the list",
+    "organizationLabel": "Organization",
+    "organizationPlaceholder": "Enter your organization",
+    "roleLabel": "Job title / Role",
+    "rolePlaceholder": "Enter your job title or role",
+    "languagesLabel": "Languages you speak (comma-separated)",
+    "languagesPlaceholder": "e.g. Korean, English",
+    "englishProficiencyLabel": "English proficiency",
+    "selectPlaceholder": "Please select",
+    "communicationStyleLabel": "Preferred communication style",
+    "additionalLabel": "Additional notes (optional)",
+    "additionalPlaceholder": "e.g. Please speak slowly, I may need extra explanation for certain terms",
+    "saving": "Saving...",
+    "submit": "Save & Go Back"
+  },
+  "profileOptions": {
+    "englishProficiency": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    },
+    "communicationStyle": {
+      "DIRECT": "Direct",
+      "INDIRECT": "Indirect",
+      "FACT_FOCUSED": "Fact-focused",
+      "EMOTION_EXPRESSIVE": "Emotionally expressive",
+      "BALANCED": "Balanced"
+    }
+  },
+  "meetingRoom": {
+    "feedbackAfter": "Feedback after speaking",
+    "feedbackAfterDisabledReason": "Not available since you didn't agree to voice analysis when joining.",
+    "expressionBefore": "Translate before speaking",
+    "meetingInfo": "Meeting Info",
+    "myProfileEdit": "Edit My Profile",
+    "joinProfileFirst": "Please fill in your profile to join.",
+    "joinThisMeeting": "Join this meeting",
+    "connectionError": "Connection error: ",
+    "connecting": "Connecting...",
+    "joining": "Joining...",
+    "defaultParticipantName": "Participant",
+    "profileUpdateFailed": "Failed to update profile."
+  },
+  "bottomBar": {
+    "mic": "Mic",
+    "camera": "Camera",
+    "participants": "Participants",
+    "end": "Leave",
+    "confirmLeave": "Are you sure you want to leave the meeting?",
+    "cancel": "Cancel",
+    "leave": "Leave"
+  },
+  "expressionPanel": {
+    "title": "Translate before speaking",
+    "targetLabel": "To",
+    "targetPlaceholder": "Select a participant",
+    "inputPlaceholder": "Type what you want to say",
+    "generating": "Generating...",
+    "generateButton": "Generate English phrase",
+    "resultLabel": "Recommended phrase",
+    "syncingAlert": "Syncing participant profile. Please try again shortly."
+  },
+  "feedbackPanel": {
+    "title": "Feedback after speaking",
+    "detectedLabel": "Just detected",
+    "noDetectionYet": "No speech detected yet.",
+    "warningTitle": "This might come across as",
+    "waitingText": "Feedback will appear once something is detected.",
+    "alternativeLabel": "Alternative",
+    "closeButton": "Close feedback"
+  },
+  "meetingInfoModal": {
+    "title": "Meeting Info",
+    "nameLabel": "Meeting name",
+    "loading": "Loading...",
+    "startTimeLabel": "Start time",
+    "participantsLabel": "Participants",
+    "copyButton": "Copy invite link",
+    "copiedButton": "Copied"
+  },
+  "participantProfile": {
+    "title": "Participant Profile",
+    "loadFailedError": "Failed to load profile.",
+    "loading": "Loading...",
+    "hostBadge": "Host",
+    "languageSectionTitle": "Language",
+    "mainLanguageLabel": "Languages spoken:",
+    "englishLevelLabel": "English level:",
+    "communicationLabel": "Communication style:",
+    "noteLabel": "Notes:",
+    "noteEmpty": "None"
+  },
+  "participantInfoBar": {
+    "detailButton": "Profile",
+    "selfSuffix": " (You)"
+  },
+  "participantsPanel": {
+    "micOn": "Mic on",
+    "micOff": "Mic off",
+    "cameraOn": "Camera on",
+    "cameraOff": "Camera off",
+    "hostSuffix": "(Host)",
+    "selfSuffix": " (You)"
+  }
+}
